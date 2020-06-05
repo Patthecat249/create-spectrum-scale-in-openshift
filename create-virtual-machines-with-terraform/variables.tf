@@ -4,7 +4,7 @@ variable "vsphere_server" {
 }
 
 variable "vsphere_user" {
-  default = "administrator@home.local"
+  default = "********"
 }
 
 variable "vsphere_password" { 
