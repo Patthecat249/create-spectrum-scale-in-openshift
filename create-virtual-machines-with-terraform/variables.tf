@@ -8,7 +8,7 @@ variable "vsphere_user" {
 }
 
 variable "vsphere_password" { 
-  default = "Test1234!"
+  default = "*******"
 }
 
 # VM-name
