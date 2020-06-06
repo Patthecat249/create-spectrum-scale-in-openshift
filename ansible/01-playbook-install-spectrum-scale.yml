@@ -131,6 +131,21 @@
         name: epel-release.noarch
         state: present
 
+    - name: "Create SSH-Keypair on localhost if not exists"
+      openssh_keypair:
+        path: "/root/.ssh/id_rsa"
+        size: 4096
+        type: "rsa"
+      delegate_to: localhost
+      tags:
+      - ssh
+
+    - name: "Run the initial-ssh-setup.sh-script"
+      script: initial-ssh-setup.sh
+      delegate_to: localhost
+      tags:
+      - ssh
+
 # Die "Bind-Utils" stellen Tools für Spectrum-Scale zum Prüfen der 
 # DNS-Namensauflösung bereit (nslookup)
     - name: "Installiere bind-utils-9.11.4-16.P2.el7.x86_64"
@@ -324,10 +339,33 @@
         state: stopped
         enabled: false
 
+    - name: "Install SSHPASS"
+      yum:
+        name: "sshpass.x86_64"
+        state: present
+      tags:
+      - ssh
+
+    - name: "Create SSH-Keys on remote SPS-Nodes"
+      openssh_keypair:
+        path: "/root/.ssh/id_rsa"
+        size: 4096
+        type: "rsa"
+      tags:
+      - ssh
+
+    - name: "Run the initial-ssh-setup.sh-script"
+      script: initial-ssh-setup.sh
+      tags:
+      - ssh
+
+    - name: "Setup SPS-Installation-Node on {{ sps_node1 }}"
+      raw: "{{ item }}"
+      with_items:
+        - "{{ spectrumscale_cmd }} setup -s 10.0.249.241 -i /root/.ssh/id_rsa"
+
     - name: "Execute spectrum-scale-raw-commands on {{ sps_node1 }}"
       raw: "{{ item }}"
-      #raw: "spectrumscale nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
-        
       with_items:
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} /dev/sdb -fs gpfs"

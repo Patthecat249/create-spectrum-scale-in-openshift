@@ -1,0 +1,28 @@
+- name: "Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
+  hosts: localhost
+  tasks:
+    - name: "Install sshpass"
+      dnf:
+        name: "sshpass"
+        state: present
+      tags:
+      - ssh
+    - name: "Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
+      openssh_keypair:
+        path: "/root/.ssh/id_rsa"
+        size: 4096
+        type: "rsa"
+      tags:
+      - ssh
+    - name: "Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
+      raw: "{{ item }}"
+      with_items:
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.241"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2.home.local"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.242"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3.home.local"
+        - "sshpass -p Test1234 ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.243"
