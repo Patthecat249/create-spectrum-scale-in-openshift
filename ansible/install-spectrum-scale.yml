@@ -104,10 +104,13 @@
   hosts: spectrumscale
   gather_facts: false
   vars:
-    entpack_dir: "/root/SVA/spectrumscale/"
+    sps_node1: "sps1.home.local"
+    sps_node2: "sps2.home.local"
+    sps_node3: "sps3.home.local"
+    entpack_dir: "/root/sva/spectrumscale/"
     zone: public
-    ftp: 21/tcp
-    dns: 53/udp
+    #ftp: 21/tcp
+    #dns: 53/udp
   # Hier beginnen Tasks für das erste Play
   tasks:
     # Dies ist der erste Task
@@ -299,5 +302,13 @@
         name: firewalld
         state: stopped
         enabled: false
+    - name: "Execute the Spectrum-Scale preparation commands"
+      hosts: "{{ sps_node1 }}"
+      raw: "{{ item }}"
+        
+      with_items:
+        - "spectrumscale nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
+        - "spectrumscale nsd add -p {{ sps_node2 }} /dev/sdb -fs gpfs"
+        - "spectrumscale nsd add -p {{ sps_node3 }} /dev/sdb -fs gpfs"
 
 ### --- END ANSIBLE-SKRIPT --- ###
