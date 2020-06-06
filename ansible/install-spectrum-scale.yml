@@ -320,9 +320,10 @@
         name: firewalld
         state: stopped
         enabled: false
-    - name: "Execute the Spectrum-Scale preparation commands"
-      hosts: "{{ sps_node1 }}"
+
+    - name: "Execute spectrum-scale-raw-commands"
       raw: "{{ item }}"
+      #raw: "spectrumscale nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
         
       with_items:
         - "spectrumscale nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
