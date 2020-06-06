@@ -106,9 +106,11 @@
   hosts: spectrumscale
   gather_facts: false
   vars:
+    spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
     sps_node1: "sps1.home.local"
     sps_node2: "sps2.home.local"
     sps_node3: "sps3.home.local"
+    sps_filesystem1: "/ibm/gpfs/"
     entpack_dir: "/opt/sva/spectrumscale/"
     entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
     src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
@@ -199,6 +201,7 @@
         state: "directory"
       with_items:
         - "{{ entpack_dir }}"
+        - "{{ sps_filesystem1 }}"
 
 # Prüfe, ob das 1,9GB große TAR-GZ-File bereits auf dem SPS-Node vorhanden ist.
 # Wenn ja, überspringe den Kopiervorgang.
@@ -326,8 +329,24 @@
       #raw: "spectrumscale nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
         
       with_items:
-        - "spectrumscale nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
-        - "spectrumscale nsd add -p {{ sps_node2 }} /dev/sdb -fs gpfs"
-        - "spectrumscale nsd add -p {{ sps_node3 }} /dev/sdb -fs gpfs"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} /dev/sdb -fs gpfs"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} /dev/sdb -fs gpfs"
+        - "{{ spectrumscale_cmd }} config gpfs -c sps.home.local"
+        - "{{ spectrumscale_cmd }} config ntp -e on -s 10.0.249.1"
+        - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
+        - "{{ spectrumscale_cmd }} callhome disable"
+        - "{{ spectrumscale_cmd }} config protocols -f gpfs -m {{ sps_filesystem1 }}"
+        - "{{ spectrumscale_cmd }} config protocols -f patrick -m /home/gpfs/test/"
+        - "{{ spectrumscale_cmd }} config protocols -e 10.0.249.245"
+        - "{{ spectrumscale_cmd }} enable smb nfs"
+        - "{{ spectrumscale_cmd }} config protocols -l"
+        - "{{ spectrumscale_cmd }} node add sps1.home.local -amnpq"
+        - "{{ spectrumscale_cmd }} node add sps2.home.local -amnpq"
+        - "{{ spectrumscale_cmd }} node add sps3.home.local -amnpqg"
+
+#        - "{{ spectrumscale_cmd }} node list"
+#        - "{{ spectrumscale_cmd }} nsd list"
+      when: "'sps1' in inventory_hostname"
 
 ### --- END ANSIBLE-SKRIPT --- ###
