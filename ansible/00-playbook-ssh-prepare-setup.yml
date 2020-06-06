@@ -1,8 +1,11 @@
 - name: "Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
-  hosts: localhost
+#  hosts: localhost
+  hosts: spectrumscale
+  vars:
+#    ansible_python_interpreter: /usr/bin/python3
   tasks:
     - name: "Install sshpass"
-      dnf:
+      yum:
         name: "sshpass"
         state: present
       tags:
