@@ -270,13 +270,30 @@ tftp-root=/home/tftproot/rootdir/tftpboot
 
 # Installation-Process-Description
 
-This describes the installation-process of spectrum-scale from a high-level-point-of-view. You have to execute the following step-by-step.
+```bash
+# Login to your Ansible-Control-Node as root
+# ssh terraform.home.local
+# switch to root-home-directory
+cd /root
+# create folder "git"
+mkdir git
+# clone git repository
+git clone https://github.com/Patthecat249/spectrum-scale.git
+# change into ansible-working-directory to execute scripts
+cd git/spectrum-scale/ansible/
+# Install Helper-Tool sshpass
+yum install sshpass -y
+dnf install sshpass -y
+# execute the initial-setup-script
+./initial-ssh-setup.sh
+# execute the playbook one after another
+ansible-playbook 00-playbook-ssh-prepare-setup.yml
+ansible-playbook 01-playbook-install-spectrum-scale.yml
+ansible-playbook 02-playbook-create-spectrum-scale-user.yml
+# Login to Spectrum-Scale GUI
+```
 
-* Prepare the Ansible-Control-Node to execute code on the three managed Spectrum-Scales-Nodes. Execute the ***"initial-ssh-setup.sh"*** script.
-* Execute the three ansible-playbooks, one after another. Wait for completion of a playbook, to start the next one.
-  * 00-playbook-ssh-prepare-setup.yml
-  * 01-playbook-install-spectrum-scale.yml
-  * 02-playbook-create-spectrum-scale-user.yml
+
 
 ## Ansible-Control-Node preparation
 
