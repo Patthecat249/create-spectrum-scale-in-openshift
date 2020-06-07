@@ -5,9 +5,20 @@
 - [General documentation-information](#General-documentation-information)
   * [Requirements](#Requirements)
     + [IP-Address <> DNS-Names <> Description](#IP-Address-<>-DNS-Names-<>-Description)
-    + [PXE-TFTP-Server-Config](#PXE-TFTP-Server-Config)
-    + [Example of file: 01-00-50-56-a6-ff-fd](#Example-of-file:-01-00-50-56-a6-ff-fd)
-    
+      + [PXE-TFTP-Server-Config](#PXE-TFTP-Server-Config)
+      + [Example of file 01-00-50-56-a6-ff-fd](#Example-of-file-01-00-50-56-a6-ff-fd)
+    + [DNSMASQ.conf on DHCP-/DNS-Server](#DNSMASQ.conf-on-DHCP-/DNS-Server)
+    + [DNSMASQ.conf on PXE-/TFTP-Server](#DNSMASQ.conf-on-PXE-/TFTP-Server)
+- [Installation-Process-Description](#Installation-Process-Description)
+  * [Ansible-Control-Node preparation](#Ansible-Control-Node-preparation)
+    + [Download and Install helper-tool sshpass](#Download-and-Install-helper-tool-sshpass)
+    + [initial-ssh-setup.sh](#initial-ssh-setup.sh)
+  * [Ansible-Playbook-Documentation](#Ansible-Playbook-Documentation)
+    + [00-playbook-ssh-prepare-setup.yml](#00-playbook-ssh-prepare-setup.yml)
+    + [01-playbook-install-spectrum-scale.yml](#01-playbook-install-spectrum-scale.yml)
+    + [02-playbook-create-spectrum-scale-user.yml](#02-playbook-create-spectrum-scale-user.yml)
+  * [Login to Spectrum-Scale GUI](#Login-to-Spectrum-Scale-GUI)
+## 
 
 # General documentation-information #
 
@@ -96,7 +107,7 @@ The following files **must be** in the "**pxe-linux-config-file-folder**"
 
 
 
-#### Example of file: 01-00-50-56-a6-ff-fd
+#### Example of file 01-00-50-56-a6-ff-fd
 When the vm boots per PXE, it receives an IP-address, subnet-mask and gateway and it also gets an information, where the Preboot-Execution-Server will be found from the DHCP-Server (DNSMASQ). There (on the TFTP-Server) it looks first for his mac-address in the "pxe-linux-config-file-folder" of the TFTP-Server. It finds a file and executes the content.
 
 * loads the centos-vmlinuz-kernel
@@ -271,7 +282,7 @@ This describes the installation-process of spectrum-scale from a high-level-poin
 
 The first thing you have to do, is to execute the ***"initial-ssh-setup.sh"***-script. It creates an SSH-Keypair (***ssh-keygen***) on your Ansible-Control-Node and deploys (***ssh-copy-id***) the SSH-Public-Key to the Managed-Spectrum-Nodes.
 
-### Download and Install helper-tool: sshpass
+### Download and Install helper-tool sshpass
 
 You may have to download and install the helper-tool ***sshpass*** to the Ansible-Control-Node.
 
@@ -301,15 +312,364 @@ sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyCheckin
 
 ## Ansible-Playbook-Documentation
 
+The following chapters describe the real Installation-Process of Spectrum-Scale.
+
 ### 00-playbook-ssh-prepare-setup.yml
+
+```yaml
+# Playbook starts here
+- name: "Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
+  hosts: spectrumscale #The inventory-file contains a Group of the three sps-nodes
+  tasks:
+    # If sshpass is not installed, it will do so now
+    - name: "Install sshpass"
+      yum:
+        name: "sshpass"
+        state: present
+      tags:
+      - ssh
+    
+    # It creates a ssh-keypair on each sps-node
+    - name: "Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
+      openssh_keypair:
+        path: "/root/.ssh/id_rsa"
+        size: 4096
+        type: "rsa"
+      tags:
+      - ssh
+    
+    # It distributes each created ssh-key between all sps-nodes. This is important, because the SPS-Installation need this 
+    - name: "Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
+      raw: "{{ item }}"
+      with_items:
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.241"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2.home.local"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.242"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3.home.local"
+        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.243"
+```
+
+
 
 ### 01-playbook-install-spectrum-scale.yml
 
+```yaml
+---
+### --- BEGIN ANSIBLE-SKRIPT --- ###
+- name: Install prerequisites for IBM Spectrum-Scale on CentOS7.7
+  hosts: spectrumscale
+  gather_facts: false
+  vars:
+# This is the central command, to install, configure and deploy spectrum scale later
+    spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
+# After you extract the tar-gz-file this command must be executed
+    sps_install_filename: "Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+# This is the SPS-Cluster-Name
+    sps_cluster_name: "sps.home.local"
+# This is the IP-Adress of the Node which will be the Chef-Setup-Node for Spectrum-Scale. sps1.home.local has the 10.0.249.241
+    sps_setup_node_ip: "10.0.249.241"
+# IP-Address of a NTP-server
+    sps_ntp_ip1: "10.0.249.1"
+# IP-Adress of Cluster-Export-Services
+    sps_ces_export_ip1: "10.0.249.245"
+# FQDNs of the three Spectrum-Scale-VMs
+    sps_node1: "sps1.home.local"
+    sps_node2: "sps2.home.local"
+    sps_node3: "sps3.home.local"
+# The Device-Names of the DISK, which will be created in the terraform-script. 
+# Disk-Unit-Number=1 will be /dev/sdb"
+# Disk-Unit-Number=2 will be /dev/sdc"
+    sps_dev1: "/dev/sdb"
+    sps_dev2: "/dev/sdc"
+# The mount-point, where the filesystems will be mounted
+# The folders will be created by this ansible-script, if they does not exist
+    sps_filesystem1: "/ibm/gpfs/"
+    sps_filesystem2: "/ibm/patrick/"
+# The Spectrum-Scale-Filesystem-Names
+# /dev/sdb > gpfs > /ibm/gpfs/
+# /dev/sdc > patrick > /ibm/patrick/
+    sps_fs1: "gpfs"
+    sps_fs2: "patrick"
+# The central used SSH-Keypair based on name
+# private-key: id_rsa
+# public-key: id_rsa.pub
+    private_root_key: "/root/.ssh/id_rsa"
+# The central working-directory on the sps-nodes
+    entpack_dir: "/opt/sva/spectrumscale/"
+# Name of the tar-file. this must be downloaded from IBM (passport advantage)
+    entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
+# The nfs-server and path, where the tar-gz-file is in
+    src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
+# Mountpoint on sps-node
+    dest_nas_mount_path: "/mnt"
+  tasks:
+
+### Install Prerequisites for Spectrum-Scale alias GPFS
+
+# Add EPEL-Release-Repo
+# - This will be needed to download some prerequisites fro SPS
+    - name: "Add EPEL-Release-Repo"
+      yum:
+        name: epel-release.noarch
+        state: present
+
+# The "Bind-Utils" are needed for Spectrum-Scale to check dns with nslookup
+    - name: "Installiere bind-utils-9.11.4-16.P2.el7.x86_64"
+      yum:
+        name: bind-utils-9.11.4-16.P2.el7.x86_64
+        state: present
+
+# The "NFS-Utils" are needed to use the nfs-client to download the tar-file from nfs-server
+    - name: "Installiere NFS-UTILS"
+      yum:
+        name: nfs-utils.x86_64
+        state: present
+
+# net-tools provide some Basic networking tools
+    - name: "Installiere net-tools"
+      yum:
+        name: net-tools
+        state: present
+
+# Spectrum-Scale is looking for ntp-daemon
+    - name: "Installiere ntp.x86_64"
+      yum:
+        name: ntp.x86_64
+        state: present
+
+# Spectrum-Scale needs The C Preprocessor
+    - name: "Installiere cpp.x86_64"
+      yum:
+        name: cpp.x86_64
+        state: present
+
+# The Various compilers (C, C++, Objective-C, Java, ...) 
+    - name: "Installiere gcc.x86_64"
+      yum:
+        name: gcc.x86_64
+        state: present
+
+# C++ support for GCC
+    - name: "Installiere gcc-c++.x86_64"
+      yum:
+        name: gcc-c++.x86_64
+        state: present
+### Installation of prerequisites is completed
+
+
+# Checks, if the the working-directory exists
+    - name: "Check if folder exists"
+      stat:
+        path: "{{ entpack_dir }}"
+      register: folder_details
+
+    - name: "DEBUG"
+      debug:
+        msg: "{{ folder_details }}"
+
+# If working-directory is not present. It will be created. Also folders for the GPFS-mountpoints will be created.
+    - name: "Spectrum-Scale-Entpack-Verzeichnis erstellen"
+      file:
+        recurse: true
+        path: "{{ item }}"
+        state: "directory"
+      with_items:
+        - "{{ entpack_dir }}"
+        - "{{ sps_filesystem1 }}"
+        - "{{ sps_filesystem2 }}"
+      when:
+        - not folder_details.stat.exists
+        
+# Check, if TAR-Files exists on SPS-Nodes
+# if exist, continue without doing anythin
+# if not, Mount NFS-Share > download > extract file > unmount nfs-share
+    - name: "Check if TAR-File exists on Remote-Machine in Entpack_Directory"
+      stat:
+        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+      register: tar_details
+
+    - name: "DEBUG"
+      debug:
+        msg: "{{ tar_details }}"
+
+# Mount the nfs-share, only if file doesn't exist
+    - name: "Mounting NFS-Share"
+      mount:
+        fstype: nfs
+        opts: defaults
+        state: mounted
+        src: "{{ src_nas_mount }}"
+        path: "{{ dest_nas_mount_path }}"
+        backup: yes
+      when:
+        - not tar_details.stat.exists
+
+# Wait a Second for mounting nfs)
+    - name: "Wait a Second..."
+      wait_for:
+        timeout: 1
+
+# Copy TAR-File directly from nfs-server to sps-nodes
+    - name: "Copy TAR-File from NFS-Server to SPS-Nodes"
+      copy:
+        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
+        dest: "{{ entpack_dir }}"
+        remote_src: yes
+      when:
+        - not tar_details.stat.exists
+
+# Unmount the nfs-share. Won't needed anymore.
+    - name: "Unmounting NFS-Share"
+      mount:
+        fstype: nfs
+        opts: defaults
+        state: absent
+        src: "{{ src_nas_mount }}"
+        path: "{{ dest_nas_mount_path }}"
+        backup: yes
+      when:
+        - not tar_details.stat.exists
+
+# Check, if TAR was downloaded correctly and is present on sps-nodes
+    - name: "Check if TAR-File exists on Remote-Machine"
+      stat:
+        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+      register: tar_after_copy_details
+
+# Extract the TAR-GZ-File in working-drectory
+    - name: "Extract Tar-File"
+      unarchive:
+        src: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        dest: "{{ entpack_dir }}"
+        remote_src: yes
+      when:
+        - tar_after_copy_details.stat.exists
+
+# Need some more Dependencies. 
+# Spectrum-Scale expects this explicit version of Kernel Devel and Header
+    - name: "Copy Kernel Devel from Ansible-Control-Node"
+      copy:
+        src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+
+    - name: "Copy Kernel Header from Ansible-Control-Node"
+      copy:
+        src: "../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+
+    - name: "Install Kernel Devel"
+      yum:
+        name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        allow_downgrade: yes
+        state: present
+
+    - name: "Install Kernel Header"
+      yum:
+        name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        allow_downgrade: yes
+        state: present
+
+# EPEL-Release-Repo must be detached, because Spectrum-Scale checks it and will fail with installation, if EPEL-Repo is present
+    - name: "Remove EPEL-Release-Repo"
+      yum:
+        name: epel-release.noarch
+        state: absent
+
+# The easiest way to get Spectrum-Scale running is to disable the Firewall
+    - name: "Stop and disable firewalld"
+      service:
+        name: firewalld
+        state: stopped
+        enabled: false
+
+# Spectrum-Scale will install the base-binaries
+# The Installer is executed with echo '1' to accept the license automatically
+    - name: "Execute SpectrumScale Install-File"
+      raw: "{{ item }}"
+      with_items:
+#        - "echo '1' | /opt/sva/spectrumscale/Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+        - "echo '1' | { entpackdir }}{{ sps_install_filename }}"
+
+# The Spectrum-Scale-Setup-Node will be defined. It my case, this is sps1.home.local
+# when condition is needed, because this task must only be executed on sps1
+    - name: "Setup Spectrum-Scale-Installation-Node"
+      raw: "{{ item }}"
+      with_items:
+        - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# This will configure the Spectrum-Scale-Cluster
+# Defines cluster-anem, ports, protocols, nsd, nodes, and so on
+    - name: "Configure Spectrum-Scale"
+      raw: "{{ item }}"
+      with_items:
+        - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
+        - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
+        - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
+        - "{{ spectrumscale_cmd }} callhome disable"
+        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
+        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
+        - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
+        - "{{ spectrumscale_cmd }} enable smb nfs"
+        - "{{ spectrumscale_cmd }} config protocols -l"
+        - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
+        - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
+        - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# Spectrum Scale Install Precheck
+# This runs the Install-Prechecker
+    - name: "Install Spectrum-Scale --precheck"
+      raw: "{{ spectrumscale_cmd }} install --precheck"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# Spectrum Scale Install
+# This must be run as a script and not as 'raw'-command, because it needs on longtime.
+# Appr. time 30-60 minutes
+    - name: "Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
+      script: "spectrumscale-install-deploy.sh"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
+
+### --- END ANSIBLE-SKRIPT --- ###
+```
+
+The installation and configuration is ***finished***. For GUI-access execute the next playbook. 
+
 ### 02-playbook-create-spectrum-scale-user.yml
+
+This Playbook creates two Users in two Groups. The csiadmin should be used by OpenShift.
+
+| User     | Password | Group         |
+| -------- | -------- | ------------- |
+| patrick  | Test1234 | SecurityAdmin |
+| csiadmin | Test1234 | CsiAdmin      |
+
+
+
+```yaml
+- name: "Playbook - Create Spectrum-Scale-Users"
+  hosts: "sps3.home.local"
+  gather_facts: false
+  tasks:
+    - name: "Create User on GUI-Node"
+      raw: "{{ item }}"
+      with_items:
+        - "/usr/lpp/mmfs/gui/cli/mkuser csiadmin -p Test1234 -g CsiAdmin"
+        - "/usr/lpp/mmfs/gui/cli/mkuser patrick -p Test1234 -g SecurityAdmin"
+```
+
+
 
 ## Login to Spectrum-Scale GUI
 
-```bash
 https://sps3.home.local
-```
-
