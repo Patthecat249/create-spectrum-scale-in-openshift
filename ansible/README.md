@@ -2,10 +2,6 @@
 
 [TOC]
 
-[Heading](#General documentation-information)
-  [Sub-heading](#Requirements)
-    [Sub-sub-heading](#IP-Address <> DNS-Names <> Description)
-
 # General documentation-information #
 
 This playbook describes the installation of three IBM Spectrum-Scale-Nodes on virtual machines and makes the installation and configuration easier. The deneral documentation information introduce a little piece of the environment, in which the spectrum-scale-cluster will be deployed.
