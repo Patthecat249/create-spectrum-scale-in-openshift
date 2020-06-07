@@ -2,11 +2,11 @@
 
 [TOC]
 
-[General documentation-information](#General-documentation-information)
-  [Requirements](#Requirements)
-    [IP-Address <> DNS-Names <> Description](#IP-Address-<>-DNS-Names-<>-Description)
-    [PXE-TFTP-Server-Config](#PXE-TFTP-Server-Config)
-    [Example of file: 01-00-50-56-a6-ff-fd](#Example-of-file:-01-00-50-56-a6-ff-fd)
+- [General documentation-information](#General-documentation-information)
+  * [Requirements](#Requirements)
+    + [IP-Address <> DNS-Names <> Description](#IP-Address-<>-DNS-Names-<>-Description)
+    + [PXE-TFTP-Server-Config](#PXE-TFTP-Server-Config)
+    + [Example of file: 01-00-50-56-a6-ff-fd](#Example-of-file:-01-00-50-56-a6-ff-fd)
     
 
 # General documentation-information #
