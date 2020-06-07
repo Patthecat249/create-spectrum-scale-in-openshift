@@ -8,10 +8,13 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 1. #### Login on terraform-host (VM)
 
    ```bash
-   ssh root@terraform-master
+   ssh root@terraform.home.local
    mkdir git
    cd git
    git clone https://github.com/Patthecat249/spectrum-scale.git
+   # Install Helper-Tool sshpass
+   yum install sshpass -y
+   # dnf install sshpass -y
    ```
 
    
