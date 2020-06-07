@@ -2,6 +2,13 @@
 
 [TOC]
 
+[General documentation-information](#General-documentation-information)
+  [Requirements](#Requirements)
+    [IP-Address <> DNS-Names <> Description](#IP-Address-<>-DNS-Names-<>-Description)
+    [PXE-TFTP-Server-Config](#PXE-TFTP-Server-Config)
+    [Example of file: 01-00-50-56-a6-ff-fd](#Example-of-file:-01-00-50-56-a6-ff-fd)
+    
+
 # General documentation-information #
 
 This playbook describes the installation of three IBM Spectrum-Scale-Nodes on virtual machines and makes the installation and configuration easier. The deneral documentation information introduce a little piece of the environment, in which the spectrum-scale-cluster will be deployed.
