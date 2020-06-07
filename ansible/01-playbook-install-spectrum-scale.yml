@@ -111,16 +111,14 @@
     sps_node2: "sps2.home.local"
     sps_node3: "sps3.home.local"
     sps_filesystem1: "/ibm/gpfs/"
+    sps_filesystem2: "/ibm/patrick/"
     entpack_dir: "/opt/sva/spectrumscale/"
     entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
     src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
     dest_nas_mount_path: "/mnt"
     zone: public
-    #ftp: 21/tcp
     #dns: 53/udp
-  # Hier beginnen Tasks für das erste Play
   tasks:
-    # Dies ist der erste Task
 
 ### Prerequisites für GPFS installieren
 
@@ -130,21 +128,6 @@
       yum:
         name: epel-release.noarch
         state: present
-
-    - name: "Create SSH-Keypair on localhost if not exists"
-      openssh_keypair:
-        path: "/root/.ssh/id_rsa"
-        size: 4096
-        type: "rsa"
-      delegate_to: localhost
-      tags:
-      - ssh
-
-    - name: "Run the initial-ssh-setup.sh-script"
-      script: initial-ssh-setup.sh
-      delegate_to: localhost
-      tags:
-      - ssh
 
 # Die "Bind-Utils" stellen Tools für Spectrum-Scale zum Prüfen der 
 # DNS-Namensauflösung bereit (nslookup)
@@ -217,6 +200,7 @@
       with_items:
         - "{{ entpack_dir }}"
         - "{{ sps_filesystem1 }}"
+        - "{{ sps_filesystem2 }}"
 
 # Prüfe, ob das 1,9GB große TAR-GZ-File bereits auf dem SPS-Node vorhanden ist.
 # Wenn ja, überspringe den Kopiervorgang.
@@ -252,7 +236,7 @@
 # Spectrum-Scale-Node kopiert. Dieser Kopiervorgang finde nur zwischen 
 # SPS-Node und NFS-Server statt. Das File wird nicht vorher auf den 
 # Control-Node geladen
-    - name: "Copy TAR-File from NFS-Servers to SPS-Node"
+    - name: "Copy TAR-File from NFS-Server to SPS-Nodes"
       copy:
         src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
         dest: "{{ entpack_dir }}"
@@ -274,13 +258,13 @@
 
 # Prüfe, ob das 1,9GB große TAR-GZ-File bereits auf dem SPS-Node vorhanden ist. 
 # Wenn ja, überspringe den Kopiervorgang.
-    - name: "Check if TAR-File exists on Remote-Machine after Copy"
+    - name: "Check if TAR-File exists on Remote-Machine"
       stat:
         path: "{{ entpack_dir }}{{ entpack_tar_file }}"
       register: tar_after_copy_details
 
 # Entpacke das TAR-GZ-File in den Entpack-Ordner
-    - name: "Entpacke Tar-File"
+    - name: "Extract Tar-File"
       unarchive:
         src: "{{ entpack_dir }}{{ entpack_tar_file }}"
         dest: "{{ entpack_dir }}"
@@ -288,51 +272,34 @@
       when:
         - tar_after_copy_details.stat.exists
 
-    - name: "Copy private SSH-Key from TERRAFORM-Host to SPS-Nodes"
-      copy:
-        src: ~/.ssh/id_rsa
-        dest: /root/.ssh/
-        mode: 0600
-    - name: "Copy public SSH-Key from TERRAFORM-Host to SPS-Nodes"
-      copy:
-        src: ~/.ssh/id_rsa.pub
-        dest: /root/.ssh/
-        mode: 0600
-
-    - name: "Create Known-Hosts"
-      known_hosts:
-        path: /root/.ssh/known_hosts
-        state: present
-        name: terraform-master.local
-        key: "terraform-master.local ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/8D/97nylP7SmfLwqqQguoT6NAAhA667vto++4M3hSWOF65KDh3vogvy8KPMc6//YpvkH4tZuGP1Y01vsJedZDK5ZR4S0XxdKf4i6N49+0d7syCzveEWieWQws/yplyU/Fko/msWuWMGiE3O6euLdv75EMd7LSBWTe6vyy9wX9k19oP2krNVuCbTOn8ZTB6tpgXrRrGVuScTAyH1F85Ogv4r5E4tDh0/XSXRQk+tYFPvSUxSK4Dnju8IKbkVqDeeAq7S5USETmpLY5DWAa6yjhaMorMOS8UopJnvaMi0d1oKzUG5ttITLllOTCObn6iYq/O6pVJMFYVgJxOvxOLIr"
-
 ###
-    - name: "Copy Kernel Devel"
+    - name: "Copy Kernel Devel from Ansible-Control-Node"
       copy:
         src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
-    - name: "Copy Kernel Header"
+
+    - name: "Copy Kernel Header from Ansible-Control-Node"
       copy:
         src: "../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+
     - name: "Install Kernel Devel"
       yum:
         name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
+
     - name: "Install Kernel Header"
       yum:
         name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
-    - name: "Copy Known_hosts-Datei"
-      copy:
-        src: "/root/.ssh/known_hosts"
-        dest: "/root/.ssh/known_hosts"
+
     - name: "Remove EPEL-Release-Repo"
       yum:
         name: epel-release.noarch
         state: absent
+
     - name: "Stop and disable firewalld"
       service:
         name: firewalld
@@ -346,52 +313,49 @@
       tags:
       - ssh
 
-    - name: "Create SSH-Keys on remote SPS-Nodes"
-      openssh_keypair:
-        path: "/root/.ssh/id_rsa"
-        size: 4096
-        type: "rsa"
-      tags:
-      - ssh
+# Hier muss dann der Part mit dem Ausführen des Entpack-Files rein
+    - name: "Execute SpectrumScale Install-File"
+      raw: "{{ item }}"
+      with_items:
+        - "echo '1' | /opt/sva/spectrumscale/Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
 
-    - name: "Run the initial-ssh-setup.sh-script"
-      script: initial-ssh-setup.sh
-      tags:
-      - ssh
-
-    - name: "Setup SPS-Installation-Node on {{ sps_node1 }}"
+    - name: "Setup Spectrum-Scale-Installation-Node"
       raw: "{{ item }}"
       with_items:
         - "{{ spectrumscale_cmd }} setup -s 10.0.249.241 -i /root/.ssh/id_rsa"
+      when: "'sps1' in inventory_hostname"
 
-    - name: "Execute spectrum-scale-raw-commands on {{ sps_node1 }}"
+    - name: "Configure Spectrum-Scale"
       raw: "{{ item }}"
       with_items:
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} /dev/sdb -fs gpfs"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} /dev/sdb -fs gpfs"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} /dev/sdb -fs gpfs"
         - "{{ spectrumscale_cmd }} config gpfs -c sps.home.local"
         - "{{ spectrumscale_cmd }} config ntp -e on -s 10.0.249.1"
         - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
         - "{{ spectrumscale_cmd }} callhome disable"
         - "{{ spectrumscale_cmd }} config protocols -f gpfs -m {{ sps_filesystem1 }}"
-        - "{{ spectrumscale_cmd }} config protocols -f patrick -m /home/gpfs/test/"
+        - "{{ spectrumscale_cmd }} config protocols -f patrick -m {{ sps_filesystem2 }}"
         - "{{ spectrumscale_cmd }} config protocols -e 10.0.249.245"
         - "{{ spectrumscale_cmd }} enable smb nfs"
         - "{{ spectrumscale_cmd }} config protocols -l"
         - "{{ spectrumscale_cmd }} node add sps1.home.local -amnpq"
         - "{{ spectrumscale_cmd }} node add sps2.home.local -amnpq"
         - "{{ spectrumscale_cmd }} node add sps3.home.local -amnpqg"
-
-#        - "{{ spectrumscale_cmd }} node list"
-#        - "{{ spectrumscale_cmd }} nsd list"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs gpfs /dev/sdb"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs gpfs /dev/sdb"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs gpfs /dev/sdb"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs patrick /dev/sdc"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs patrick /dev/sdc"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs patrick /dev/sdc"
       when: "'sps1' in inventory_hostname"
 
-    - name: "Create User on GUI-Node {{ sps_node3 }}"
-      raw: "{{ item }}"
-        
-      with_items:
-        - "/usr/lpp/mmfs/gui/cli/mkuser csiadmin -p Test1234 -g CsiAdmin"
-        - "/usr/lpp/mmfs/gui/cli/mkuser patrick -p Test1234 -g SecurityAdmin"
-      when: "'sps3' in inventory_hostname"
+# Spectrum Scale Install Precheck      
+    - name: "Install Spectrum-Scale --precheck"
+      raw: "{{ spectrumscale_cmd }} install --precheck"
+      when: "'sps1' in inventory_hostname"
+      
+# Spectrum Scale Install      
+    - name: "Execute spectrumscale-install-deploy.sh"
+      script: "spectrumscale-install-deploy.sh"
+      when: "'sps1' in inventory_hostname"
+
 ### --- END ANSIBLE-SKRIPT --- ###
