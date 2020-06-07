@@ -1,5 +1,4 @@
 ---
-### --- BEGIN ANSIBLE-SKRIPT --- ###
 - name: Voraussetzungen fuer Spectrum-Scale installieren
   hosts: spectrumscale
   gather_facts: false
@@ -25,79 +24,45 @@
     src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
     dest_nas_mount_path: "/mnt"
   tasks:
-
-### Prerequisites für GPFS installieren
-
-# Füge das EPEL-Release-Repo hinzu
-# - Dies wird für die herunterzuladenen Vorausetzungen für SPS verwendet
     - name: "Add EPEL-Release-Repo"
       yum:
         name: epel-release.noarch
         state: present
-
-# Die "Bind-Utils" stellen Tools für Spectrum-Scale zum Prüfen der 
-# DNS-Namensauflösung bereit (nslookup)
     - name: "Installiere bind-utils-9.11.4-16.P2.el7.x86_64"
       yum:
         name: bind-utils-9.11.4-16.P2.el7.x86_64
         state: present
-
-# Die "NFS-Utils" stellen den NFS-Client bereit, um das Spectrum-Scale-Image 
-# vom NFS-Server auf die Nodes zu kopieren
-    - name: "Installiere NFS-UTILS"
+    - name: "Installiere nfs-utils.x86_64"
       yum:
         name: nfs-utils.x86_64
         state: present
-
-# Die Netzwerktools stellen einige nützliche Analyse-Werkzeuge bereit
     - name: "Installiere net-tools"
       yum:
         name: net-tools
         state: present
-
-# Wir benötigen einen Funktionieren NTP-Dienst
     - name: "Installiere ntp.x86_64"
       yum:
         name: ntp.x86_64
         state: present
-    - name: "Installiere ntpdate.x86_64"
-      yum:
-        name: ntpdate.x86_64
-        state: present
-
-# C-Plus-Plus wird benötigt
     - name: "Installiere cpp.x86_64"
       yum:
         name: cpp.x86_64
         state: present
-
-# Der GNU-Compiler wird benötigt
     - name: "Installiere gcc.x86_64"
       yum:
         name: gcc.x86_64
         state: present
-
-# Der GNU-Compiler für C-Plus-Plus wird benötigt
     - name: "Installiere gcc-c++.x86_64"
       yum:
         name: gcc-c++.x86_64
         state: present
-
-# Es wird geprüft, ob das Spectrum-Scale-TAR-GZ-File mit ca. 1,9GB schon 
-# vorhanden ist. Sollte es vorhanden sein, wird die Variable mit dem Wert
-# "exists" gefüllt und alle weiteren Tasks mit den 
-# WHEN-Bedingung (not folder_details.stat.exists) werden übersprungen
-    - name: "Check if Folder exists"
+    - name: "Check if folder exists"
       stat:
         path: "{{ entpack_dir }}"
       register: folder_details
-
     - name: "DEBUG"
       debug:
         msg: "{{ folder_details }}"
-
-# Andernfalls erstelle ein Arbeitsverzeichnis (samt Unterverzeichnissen, wie 
-# in der Variable $entpack_dir angegeben)
     - name: "Spectrum-Scale-Entpack-Verzeichnis erstellen"
       file:
         recurse: true
@@ -107,20 +72,15 @@
         - "{{ entpack_dir }}"
         - "{{ sps_filesystem1 }}"
         - "{{ sps_filesystem2 }}"
-
-# Prüfe, ob das 1,9GB große TAR-GZ-File bereits auf dem SPS-Node vorhanden ist.
-# Wenn ja, überspringe den Kopiervorgang.
+      when:
+        - not folder_details.stat.exists
     - name: "Check if TAR-File exists on Remote-Machine in Entpack_Directory"
       stat:
         path: "{{ entpack_dir }}{{ entpack_tar_file }}"
       register: tar_details
-
     - name: "DEBUG"
       debug:
         msg: "{{ tar_details }}"
-
-# Existiert das File noch nicht, wird der Pfad auf dem NFS-Server gemounted, 
-# wo das File zu finden ist
     - name: "Mounting NFS-Share"
       mount:
         fstype: nfs
@@ -131,17 +91,9 @@
         backup: yes
       when:
         - not tar_details.stat.exists
-
-# Warte eine Sekunde (dies ist ein Sicherheitspuffer, damit NFS Zeit hat, den 
-# Mount bereitzustellen)
     - name: "Wait a Second..."
       wait_for:
         timeout: 1
-
-# Existiert das TAR-GZ-File noch nicht, wird es jetzt vom NFS auf den 
-# Spectrum-Scale-Node kopiert. Dieser Kopiervorgang finde nur zwischen 
-# SPS-Node und NFS-Server statt. Das File wird nicht vorher auf den 
-# Control-Node geladen
     - name: "Copy TAR-File from NFS-Server to SPS-Nodes"
       copy:
         src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
@@ -149,8 +101,6 @@
         remote_src: yes
       when:
         - not tar_details.stat.exists
-
-# Abhängen des NFS-Mounts. Dieser wird nicht weiter benötigt.
     - name: "Unmounting NFS-Share"
       mount:
         fstype: nfs
@@ -161,15 +111,10 @@
         backup: yes
       when:
         - not tar_details.stat.exists
-
-# Prüfe, ob das 1,9GB große TAR-GZ-File bereits auf dem SPS-Node vorhanden ist. 
-# Wenn ja, überspringe den Kopiervorgang.
     - name: "Check if TAR-File exists on Remote-Machine"
       stat:
         path: "{{ entpack_dir }}{{ entpack_tar_file }}"
       register: tar_after_copy_details
-
-# Entpacke das TAR-GZ-File in den Entpack-Ordner
     - name: "Extract Tar-File"
       unarchive:
         src: "{{ entpack_dir }}{{ entpack_tar_file }}"
@@ -177,61 +122,42 @@
         remote_src: yes
       when:
         - tar_after_copy_details.stat.exists
-
-###
     - name: "Copy Kernel Devel from Ansible-Control-Node"
       copy:
         src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
-
     - name: "Copy Kernel Header from Ansible-Control-Node"
       copy:
         src: "../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
-
     - name: "Install Kernel Devel"
       yum:
         name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
-
     - name: "Install Kernel Header"
       yum:
         name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
-
     - name: "Remove EPEL-Release-Repo"
       yum:
         name: epel-release.noarch
         state: absent
-
     - name: "Stop and disable firewalld"
       service:
         name: firewalld
         state: stopped
         enabled: false
-
-    - name: "Install SSHPASS"
-      yum:
-        name: "sshpass.x86_64"
-        state: present
-      tags:
-      - ssh
-
-# Hier muss dann der Part mit dem Ausführen des Entpack-Files rein
     - name: "Execute SpectrumScale Install-File"
       raw: "{{ item }}"
       with_items:
-#        - "echo '1' | /opt/sva/spectrumscale/Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
         - "echo '1' | { entpackdir }}{{ sps_install_filename }}"
-
     - name: "Setup Spectrum-Scale-Installation-Node"
       raw: "{{ item }}"
       with_items:
         - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-
     - name: "Configure Spectrum-Scale"
       raw: "{{ item }}"
       with_items:
@@ -254,15 +180,9 @@
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-
-# Spectrum Scale Install Precheck      
     - name: "Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-      
-# Spectrum Scale Install      
     - name: "Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "spectrumscale-install-deploy.sh"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-
-### --- END ANSIBLE-SKRIPT --- ###
