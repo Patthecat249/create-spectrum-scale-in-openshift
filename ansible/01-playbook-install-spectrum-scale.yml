@@ -1,123 +1,29 @@
 ---
-### - DOKUMENTATION - BEGIN --- ###
-# Dieses Playbook beschreibt die Installation von Spectrum-Scale auf drei 
-# virtuellen Maschinen und vereinfachen bzw. automatisieren die Installation von SPS
-# Author: Patrick Jahn
-# Date: 04.06.2020
-# 
-# Voraussetzungen:
-# - Internet der SPS-Nodes
-# - NFS-Server läuft und stellt folgendes bereit:
-#   - ISO-Images von CentOS-Mirror (CentOS-7-x86_64-DVD-1908.iso)
-#   - Kickstart-Config-Files zur automatisierten Installation/Konfiguration von CentOS (nfs:nas.home.local:/volume1/nfs-iso/kickstart-configs/sps1.cfg)
-# - Drei virtuelle Maschinen wurden mit Terraform aufgesetzt
-#   - CentOS 7.7.1908
-#   - 4vCPU, 
-#   - 16GB RAM, 
-#   - 120GB root-disk, 
-#   - 200GB NSD-Disk
-# - DNS:
-#   - sps1.home.local > 10.0.249.241 # Spectrum-Scale-Node#1
-#   - sps2.home.local > 10.0.249.242 # Spectrum-Scale-Node#2
-#   - sps3.home.local > 10.0.249.243 # Spectrum-Scale-Node#3
-#   - sps.home.local > 10.0.249.245 # MMCES-NFS-Exported-IP
-# - Die Netzwerk-Einstellungen (DNS, IP, Subnetz, Gateway) werden automatisch über DHCP (DNSMASQ) gesetzt
-# - Die Installation von CentOS erfolgt über PXE und kickstart-config-file
-# PXE-TFTP-Config-File-Folder: /home/tftproot/rootdir/tftpboot/pxelinux.cfg/
-#   01-00-50-56-a6-ff-fd
-#   01-00-50-56-a6-ff-fe
-#   01-00-50-56-a6-ff-ff
-# cat 01-00-50-56-a6-ff-fd
-## Der Dateiname enthält die MAC-Adresse der VM. Somit bezieht jeder Server sein Image und seine Kickstart-Config
-### - BEGIN - PXE-CONFIG-FILE ###
-#DEFAULT menu.c32
-#PROMPT 0
-#MENU TITLE Spectrum-Scale-Install-Menu
-#MENU AUTOBOOT Starting CentOS in # seconds
-#timeout 18
-#ONTIMEOUT centOS
-#LABEL centOS
-#menu label Add Spectrum-Scale-Node#1 Node
-#kernel kernels_initrd/centos_7.7.1908/vmlinuz
-#append ip=dhcp initrd=kernels_initrd/centos_7.7.1908/initrd.img inst.repo=nfs:nas.home.local:/volume1/nfs-iso/downloaded-iso/linux/CentOS-7-x86_64-DVD-1908.iso inst.ks=nfs:nas.home.local:/volume1/nfs-iso/kickstart-configs/sps1.cfg
-### - END - PXE-CONFIG-FILE ###
-
-# Output-Kickstart-Config symbolisch von einem Node
-# - Bei weiteren Nodes sollte der Hostname geändert werden, der beim Installieren vergeben wird.
-#[root@pxe-server pxelinux.cfg]# cat /mnt/iso/kickstart-configs/sps1.cfg
-### - BEGIN KICKSTART-FILE ###
-#version=DEVEL
-# System authorization information
-#auth --enableshadow --passalgo=sha512
-# Use graphical install
-#graphical
-## Use NFS installation media
-## NFS-Server-Name und Pfad muss angepasst werden !!!
-#nfs --server=nas.home.local --dir=/volume1/nfs-iso/downloaded-iso/linux/CentOS-7-x86_64-DVD-1908.iso
-## Run the Setup Agent on first boot
-#firstboot --enable
-#ignoredisk --only-use=sda
-## Keyboard layouts
-#keyboard --vckeymap=de-nodeadkeys --xlayouts='de (nodeadkeys)'
-## System language
-#lang de_DE.UTF-8
-
-## Network information
-#network  --bootproto=dhcp --device=ens192 --ipv6=auto --activate
-## Hostname muss angepasst werden !!!
-#network  --hostname=sps1.home.local
-
-## Root password
-#rootpw --iscrypted $6$fT64SdqzocRzC9or$8rlvIqfSUsDzO9WwE8i0MLspyoYZVkIOyot1HyIWwFHyr6z1EIq3jNZ94UUUpa9OitspjylBMciRQEdJrSPiZ/
-## System services
-#services --enabled="chronyd"
-## System timezone
-## Zeitserver muss angepasst werden !!!
-#timezone Europe/Berlin --isUtc --ntpservers=router.home.local
-## System bootloader configuration
-#bootloader --location=mbr --boot-drive=sda
-#autopart --type=lvm
-## Partition clearing information
-#clearpart --none --initlabel
-
-#%packages
-#@^minimal
-#@core
-#chrony
-
-#%end
-
-#%addon com_redhat_kdump --disable --reserve-mb='auto'
-
-#%end
-
-#%anaconda
-#pwpolicy root --minlen=6 --minquality=1 --notstrict --nochanges --notempty
-#pwpolicy user --minlen=6 --minquality=1 --notstrict --nochanges --emptyok
-#pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
-#%end
-#eula --agreed
-#reboot
-### - END KICKSTART-FILE ###
-### - DOKUMENTATION - BEGIN --- ###
-
 ### --- BEGIN ANSIBLE-SKRIPT --- ###
 - name: Voraussetzungen fuer Spectrum-Scale installieren
   hosts: spectrumscale
   gather_facts: false
   vars:
     spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
+    sps_install_filename: "Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+    sps_cluster_name: "sps.home.local"
+    sps_setup_node_ip: "10.0.249.241"
+    sps_ntp_ip1: "10.0.249.1"
+    sps_ces_export_ip1: "10.0.249.245"
     sps_node1: "sps1.home.local"
     sps_node2: "sps2.home.local"
     sps_node3: "sps3.home.local"
+    sps_dev1: "/dev/sdb"
+    sps_dev2: "/dev/sdc"
     sps_filesystem1: "/ibm/gpfs/"
     sps_filesystem2: "/ibm/patrick/"
+    sps_fs1: "gpfs"
+    sps_fs2: "patrick"
+    private_root_key: "/root/.ssh/id_rsa"
     entpack_dir: "/opt/sva/spectrumscale/"
     entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
     src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
     dest_nas_mount_path: "/mnt"
-    zone: public
-    #dns: 53/udp
   tasks:
 
 ### Prerequisites für GPFS installieren
@@ -317,45 +223,46 @@
     - name: "Execute SpectrumScale Install-File"
       raw: "{{ item }}"
       with_items:
-        - "echo '1' | /opt/sva/spectrumscale/Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+#        - "echo '1' | /opt/sva/spectrumscale/Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+        - "echo '1' | { entpackdir }}{{ sps_install_filename }}"
 
     - name: "Setup Spectrum-Scale-Installation-Node"
       raw: "{{ item }}"
       with_items:
-        - "{{ spectrumscale_cmd }} setup -s 10.0.249.241 -i /root/.ssh/id_rsa"
-      when: "'sps1' in inventory_hostname"
+        - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
     - name: "Configure Spectrum-Scale"
       raw: "{{ item }}"
       with_items:
-        - "{{ spectrumscale_cmd }} config gpfs -c sps.home.local"
-        - "{{ spectrumscale_cmd }} config ntp -e on -s 10.0.249.1"
+        - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
+        - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
         - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
         - "{{ spectrumscale_cmd }} callhome disable"
-        - "{{ spectrumscale_cmd }} config protocols -f gpfs -m {{ sps_filesystem1 }}"
-        - "{{ spectrumscale_cmd }} config protocols -f patrick -m {{ sps_filesystem2 }}"
-        - "{{ spectrumscale_cmd }} config protocols -e 10.0.249.245"
+        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
+        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
+        - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
         - "{{ spectrumscale_cmd }} enable smb nfs"
         - "{{ spectrumscale_cmd }} config protocols -l"
-        - "{{ spectrumscale_cmd }} node add sps1.home.local -amnpq"
-        - "{{ spectrumscale_cmd }} node add sps2.home.local -amnpq"
-        - "{{ spectrumscale_cmd }} node add sps3.home.local -amnpqg"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs gpfs /dev/sdb"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs gpfs /dev/sdb"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs gpfs /dev/sdb"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs patrick /dev/sdc"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs patrick /dev/sdc"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs patrick /dev/sdc"
-      when: "'sps1' in inventory_hostname"
+        - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
+        - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
+        - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Spectrum Scale Install Precheck      
     - name: "Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
-      when: "'sps1' in inventory_hostname"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
       
 # Spectrum Scale Install      
-    - name: "Execute spectrumscale-install-deploy.sh"
+    - name: "Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "spectrumscale-install-deploy.sh"
-      when: "'sps1' in inventory_hostname"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
 ### --- END ANSIBLE-SKRIPT --- ###
