@@ -1,0 +1,151 @@
+---
+- name: Voraussetzungen fuer Spectrum-Scale installieren
+  hosts: spectrumscale
+  gather_facts: false
+  vars:
+    spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
+    sps_install_filename: "Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+    sps_cluster_name: "sps.home.local"
+    sps_setup_node_ip: "10.0.249.241"
+    sps_ntp_ip1: "10.0.249.1"
+    sps_ces_export_ip1: "10.0.249.245"
+    sps_node1: "sps1.home.local"
+    sps_node2: "sps2.home.local"
+    sps_node3: "sps3.home.local"
+    sps_dev1: "/dev/sdb"
+    sps_dev2: "/dev/sdc"
+    sps_filesystem1: "/ibm/gpfs/"
+    sps_filesystem2: "/ibm/patrick/"
+    sps_fs1: "gpfs"
+    sps_fs2: "patrick"
+    private_root_key: "/root/.ssh/id_rsa"
+    entpack_dir: "/opt/sva/spectrumscale/"
+    entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
+    src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
+    dest_nas_mount_path: "/mnt"
+  tasks:
+#    - name: "Add EPEL-Release-Repo"
+#      yum:
+#        name: epel-release.noarch
+#        state: present
+    - name: "Installiere bind-utils-9.11.4-16.P2.el7.x86_64"
+      yum:
+        name: bind-utils-9.11.4-16.P2.el7.x86_64
+        state: present
+    - name: "Installiere nfs-utils.x86_64"
+      yum:
+        name: nfs-utils.x86_64
+        state: present
+    - name: "Installiere net-tools"
+      yum:
+        name: net-tools
+        state: present
+    - name: "Installiere ntp.x86_64"
+      yum:
+        name: ntp.x86_64
+        state: present
+    - name: "Installiere cpp.x86_64"
+      yum:
+        name: cpp.x86_64
+        state: present
+    - name: "Installiere gcc.x86_64"
+      yum:
+        name: gcc.x86_64
+        state: present
+    - name: "Installiere gcc-c++.x86_64"
+      yum:
+        name: gcc-c++.x86_64
+        state: present
+    - name: "Check if folder exists"
+      stat:
+        path: "{{ entpack_dir }}"
+      register: folder_details
+    - name: "DEBUG"
+      debug:
+        msg: "{{ folder_details }}"
+    - name: "Spectrum-Scale-Entpack-Verzeichnis erstellen"
+      file:
+        recurse: true
+        path: "{{ item }}"
+        state: "directory"
+      with_items:
+        - "{{ entpack_dir }}"
+        - "{{ sps_filesystem1 }}"
+        - "{{ sps_filesystem2 }}"
+      when:
+        - not folder_details.stat.exists
+    - name: "Check if TAR-File exists on Remote-Machine in Entpack_Directory"
+      stat:
+        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+      register: tar_details
+    - name: "DEBUG"
+      debug:
+        msg: "{{ tar_details }}"
+    - name: "Mounting NFS-Share"
+      mount:
+        fstype: nfs
+        opts: defaults
+        state: mounted
+        src: "{{ src_nas_mount }}"
+        path: "{{ dest_nas_mount_path }}"
+        backup: yes
+      when:
+        - not tar_details.stat.exists
+    - name: "Wait a Second..."
+      wait_for:
+        timeout: 1
+    - name: "Copy TAR-File from NFS-Server to SPS-Nodes"
+      copy:
+        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
+        dest: "{{ entpack_dir }}"
+        remote_src: yes
+      when:
+        - not tar_details.stat.exists
+    - name: "Unmounting NFS-Share"
+      mount:
+        fstype: nfs
+        opts: defaults
+        state: absent
+        src: "{{ src_nas_mount }}"
+        path: "{{ dest_nas_mount_path }}"
+        backup: yes
+      when:
+        - not tar_details.stat.exists
+    - name: "Check if TAR-File exists on Remote-Machine"
+      stat:
+        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+      register: tar_after_copy_details
+    - name: "Extract Tar-File"
+      unarchive:
+        src: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        dest: "{{ entpack_dir }}"
+        remote_src: yes
+      when:
+        - tar_after_copy_details.stat.exists
+    - name: "Copy Kernel Devel from Ansible-Control-Node"
+      copy:
+        src: "../../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+    - name: "Copy Kernel Header from Ansible-Control-Node"
+      copy:
+        src: "../../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+    - name: "Install Kernel Devel"
+      yum:
+        name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        allow_downgrade: yes
+        state: present
+    - name: "Install Kernel Header"
+      yum:
+        name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        allow_downgrade: yes
+        state: present
+#    - name: "Remove EPEL-Release-Repo"
+#      yum:
+#        name: epel-release.noarch
+#        state: absent
+    - name: "Stop and disable firewalld"
+      service:
+        name: firewalld
+        state: stopped
+        enabled: false
