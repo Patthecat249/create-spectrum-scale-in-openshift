@@ -14,6 +14,11 @@
         type: "rsa"
       tags:
       - ssh
+    - name: "Copy rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
+      copy:
+        src: "./rootpassword"
+        dest: "/root/rootpassword"
+
     - name: "Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
       raw: "{{ item }}"
       with_items:

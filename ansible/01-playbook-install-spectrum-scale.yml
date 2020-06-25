@@ -122,14 +122,29 @@
         remote_src: yes
       when:
         - tar_after_copy_details.stat.exists
-    - name: "Copy Kernel Devel from Ansible-Control-Node"
-      copy:
-        src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+#    - name: "Copy Kernel Devel from Ansible-Control-Node"
+#      copy:
+#        src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+#        src: "http://repo.iotti.biz/CentOS/7/x86_64/kernel-devel-3.10.0-1062.12.1.el7.centos.plus.x86_64.rpm"
+#        dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+
+    - name: "Download Kernel-Devel"
+      get_url:
+        url: "https://buildlogs.centos.org/c7.1908.00.x86_64/kernel/20190808101829/3.10.0-1062.el7.x86_64/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
-    - name: "Copy Kernel Header from Ansible-Control-Node"
-      copy:
-        src: "../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+
+#    - name: "Copy Kernel Header from Ansible-Control-Node"
+#      copy:
+#        src: "../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+#        src: "http://repo.iotti.biz/CentOS/7/x86_64/kernel-headers-3.10.0-1062.12.1.el7.centos.plus.x86_64.rpm"
+#        dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+
+    - name: "Download Kernel-Header"
+      get_url:
+        url: "https://buildlogs.centos.org/c7.1908.00.x86_64/kernel/20190808101829/3.10.0-1062.el7.x86_64/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+
+
     - name: "Install Kernel Devel"
       yum:
         name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
@@ -152,7 +167,7 @@
     - name: "Execute SpectrumScale Install-File"
       raw: "{{ item }}"
       with_items:
-        - "echo '1' | { entpackdir }}{{ sps_install_filename }}"
+        - "echo '1' | {{ entpack_dir }}{{ sps_install_filename }}"
     - name: "Setup Spectrum-Scale-Installation-Node"
       raw: "{{ item }}"
       with_items:
@@ -179,10 +194,10 @@
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "{{ sps_node1 }} in inventory_hostname"
     - name: "Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "{{ sps_node1 }} in inventory_hostname"
     - name: "Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "spectrumscale-install-deploy.sh"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "{{ sps_node1 }} in inventory_hostname"
