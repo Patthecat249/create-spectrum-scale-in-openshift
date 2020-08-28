@@ -281,9 +281,7 @@ mkdir git
 git clone https://github.com/Patthecat249/spectrum-scale.git
 # change into ansible-working-directory to execute scripts
 cd git/spectrum-scale/ansible/
-# Install Helper-Tool sshpass
-yum install sshpass -y
-dnf install sshpass -y
+
 # execute the initial-setup-script
 ./initial-ssh-setup.sh
 # execute the playbook one after another
