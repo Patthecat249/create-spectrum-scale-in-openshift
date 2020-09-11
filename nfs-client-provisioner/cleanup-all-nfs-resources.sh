@@ -6,3 +6,4 @@
  oc delete clusterrolebindings.rbac.authorization.k8s.io run-nfs-client-provisioner
  oc delete role leader-locking-nfs-client-provisioner
  oc delete rolebinding leader-locking-nfs-client-provisioner
+ oc delete sc managed-nfs-storage
