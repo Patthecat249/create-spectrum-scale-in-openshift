@@ -39,14 +39,14 @@ spec:
             - name: PROVISIONER_NAME
               value: nfs-client-provisioner
             - name: NFS_SERVER
-              value: sps.home.local
+              value: ocpbastion-rhel.home.local
             - name: NFS_PATH
-              value: /ibm/gpfs
+              value: /home/nfsshare/ocp43-patrick
       volumes:
         - name: nfs-client-root
           nfs:
-            server: sps.home.local
-            path: /ibm/gpfs
+            server: ocpbastion-rhel.home.local
+            path: /home/nfsshare/ocp43-patrick
 ---
 apiVersion: v1
 kind: ServiceAccount
