@@ -41,12 +41,12 @@ spec:
             - name: NFS_SERVER
               value: ocpbastion-rhel.home.local
             - name: NFS_PATH
-              value: /home/nfsshare/ocp43-patrick
+              value: /home/nfsshare/ocp43-patrick/registry
       volumes:
         - name: nfs-client-root
           nfs:
             server: ocpbastion-rhel.home.local
-            path: /home/nfsshare/ocp43-patrick
+            path: /home/nfsshare/ocp43-patrick/registry
 ---
 apiVersion: v1
 kind: ServiceAccount
