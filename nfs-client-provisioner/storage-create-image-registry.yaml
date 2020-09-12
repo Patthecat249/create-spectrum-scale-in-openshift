@@ -1,0 +1,15 @@
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: image-registry-storage
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /nfsshare/
+    server: ocpbastion-rhel.home.local
