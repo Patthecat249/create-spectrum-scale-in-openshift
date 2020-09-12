@@ -10,6 +10,6 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  nfs:
+  nfs: #set up path with chmod 777
     path: /nfsshare/
     server: ocpbastion-rhel.home.local
