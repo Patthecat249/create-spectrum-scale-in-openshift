@@ -1,5 +1,6 @@
 # Be carefully with execution
 # oc login as kubeadmin
+ oc project default
  oc delete deployment nfs-client-provisioner
  oc delete sa nfs-client-provisioner
  oc delete clusterrole nfs-client-provisioner-runner
