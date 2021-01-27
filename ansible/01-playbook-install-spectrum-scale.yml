@@ -6,7 +6,7 @@
     spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
     sps_install_filename: "Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
     sps_cluster_name: "sps.home.local"
-    sps_setup_node_ip: "10.0.249.241"
+    sps_setup_node_ip: "10.0.249.70"
     sps_ntp_ip1: "10.0.249.1"
     sps_ces_export_ip1: "10.0.249.245"
     sps_node1: "sps1.home.local"
@@ -30,7 +30,7 @@
         state: present
     - name: "Installiere bind-utils-9.11.4-16.P2.el7.x86_64"
       yum:
-        name: bind-utils-9.11.4-16.P2.el7.x86_64
+        name: bind-utils.x86_64
         state: present
     - name: "Installiere nfs-utils.x86_64"
       yum:
@@ -194,10 +194,10 @@
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-      when: "{{ sps_node1 }} in inventory_hostname"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
     - name: "Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
-      when: "{{ sps_node1 }} in inventory_hostname"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
     - name: "Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "spectrumscale-install-deploy.sh"
-      when: "{{ sps_node1 }} in inventory_hostname"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
