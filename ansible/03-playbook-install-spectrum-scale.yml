@@ -180,10 +180,9 @@
     - name: "20 - Add Path to bash_profile"
       lineinfile: 
         path: "/root/.bash_profile"
-        line: "{{ item }}"
-        state: "absent"
-      with_items:
-        - "PATH=$PATH:$HOME/bin:/usr/lpp/mmfs/bin"
+        regexp: "^PATH=$PATH"
+        line: "PATH=$PATH:$HOME/bin:/usr/lpp/mmfs/bin"
+        state: "present"
       tags:
         - bash
 
