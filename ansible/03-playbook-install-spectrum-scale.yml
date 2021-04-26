@@ -24,46 +24,18 @@
           - gcc-c++.x86_64
         state: "present"
 
-
-    # - name: "Installiere bind-utils-9.11.4-16.P2.el7.x86_64"
-    #   yum:
-    #     name: bind-utils.x86_64
-    #     state: present
-    # - name: "Installiere nfs-utils.x86_64"
-    #   yum:
-    #     name: nfs-utils.x86_64
-    #     state: present
-    # - name: "Installiere net-tools"
-    #   yum:
-    #     name: net-tools
-    #     state: present
-    # - name: "Installiere ntp.x86_64"
-    #   yum:
-    #     name: ntp.x86_64
-    #     state: present
-    # - name: "Installiere cpp.x86_64"
-    #   yum:
-    #     name: cpp.x86_64
-    #     state: present
-    # - name: "Installiere gcc.x86_64"
-    #   yum:
-    #     name: gcc.x86_64
-    #     state: present
-    # - name: "Installiere gcc-c++.x86_64"
-    #   yum:
-    #     name: gcc-c++.x86_64
-    #     state: present
-
-    - name: "03 - Check if folder exists"
+    - name: "03 - Check if folder {{ entpack_dir }} exists"
       stat:
         path: "{{ entpack_dir }}"
       register: folder_details
-    - name: "04 - DEBUG"
-      debug:
-        msg: "{{ folder_details }}"
-    - name: "05a - Spectrum-Scale-Entpack-Verzeichnis erstellen"
+
+    # - name: "04 - DEBUG"
+    #   debug:
+    #     msg: "{{ folder_details }}"
+
+    - name: "04 - Create Directoy {{ entpack_dir }}"
       file:
-        recurse: true
+        recurse: "true"
         path: "{{ item }}"
         state: "directory"
       with_items:
@@ -73,62 +45,78 @@
       when:
         - not folder_details.stat.exists
     
-    - name: "05b - Spectrum-Scale-Mount-Verzeichnis erstellen"
+    - name: "05 - Spectrum-Scale-Mount-Verzeichnis erstellen"
       file:
-        recurse: true
+        recurse: "true"
         path: "{{ item }}"
         state: "directory"
       with_items:
         - "{{ dest_nas_mount_path }}"
 
-    - name: "06 - Check if TAR-File exists on Remote-Machine in Entpack_Directory"
+    - name: "06 - Check if {{ entpack_dir }}{{ sps_install_filename }} exists on Remote-Machine in Entpack_Directory"
       stat:
-        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        path: "{{ entpack_dir }}{{ sps_install_filename }}"
       register: tar_details
-    - name: "07 - DEBUG"
-      debug:
-        msg: "{{ tar_details }}"
-    - name: "08 - Mounting NFS-Share"
-      mount:
-        fstype: nfs
-        opts: defaults
-        state: mounted
-        src: "{{ src_nas_mount }}"
-        path: "{{ dest_nas_mount_path }}"
-        backup: yes
-      when:
-        - not tar_details.stat.exists
-    - name: "09 - Wait a Second..."
-      wait_for:
-        timeout: 1
-    - name: "10 - Copy TAR-File from NFS-Server to SPS-Nodes"
+
+    # - name: "07 - DEBUG"
+    #   debug:
+    #     msg: "{{ tar_details }}"
+
+# Copy sps_install_filename from control-node to managed-nodes
+    - name: "07 - Copy {{sps_install_filename}} from control-node to managed-hosts"
       copy:
-        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
-        dest: "{{ entpack_dir }}"
-        remote_src: yes
-      when:
-        - not tar_details.stat.exists
-    - name: "11 - Unmounting NFS-Share"
-      mount:
-        fstype: nfs
-        opts: defaults
-        state: absent
-        src: "{{ src_nas_mount }}"
-        path: "{{ dest_nas_mount_path }}"
-        backup: yes
-      when:
-        - not tar_details.stat.exists
-    - name: "12 - Check if TAR-File exists on Remote-Machine"
-      stat:
-        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
-      register: tar_after_copy_details
-    - name: "13 - Extract Tar-File"
-      unarchive:
-        src: "{{ entpack_dir }}{{ entpack_tar_file }}"
-        dest: "{{ entpack_dir }}"
-        remote_src: yes
-      when:
-        - tar_after_copy_details.stat.exists
+        src: "{{entpack_dir}}{{sps_install_filename}}"
+        dest: "{{entpack_dir}}{{sps_install_filename}}"
+
+
+########################################################################################
+    # - name: "08 - Mounting NFS-Share"
+    #   mount:
+    #     fstype: nfs
+    #     opts: defaults
+    #     state: mounted
+    #     src: "{{ src_nas_mount }}"
+    #     path: "{{ dest_nas_mount_path }}"
+    #     backup: yes
+    #   when:
+    #     - not tar_details.stat.exists
+
+    # - name: "09 - Wait a Second..."
+    #   wait_for:
+    #     timeout: 1
+
+    # - name: "10 - Copy TAR-File from NFS-Server to SPS-Nodes"
+    #   copy:
+    #     src: "{{ dest_nas_mount_path }}/spectrumscale/{{ sps_install_filename }}"
+    #     dest: "{{ entpack_dir }}"
+    #     remote_src: yes
+    #   when:
+    #     - not tar_details.stat.exists
+
+    # - name: "11 - Unmounting NFS-Share"
+    #   mount:
+    #     fstype: nfs
+    #     opts: defaults
+    #     state: absent
+    #     src: "{{ src_nas_mount }}"
+    #     path: "{{ dest_nas_mount_path }}"
+    #     backup: yes
+    #   when:
+    #     - not tar_details.stat.exists
+
+    # - name: "12 - Check if TAR-File exists on Remote-Machine"
+    #   stat:
+    #     path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+    #   register: tar_after_copy_details
+
+    # - name: "13 - Extract Tar-File"
+    #   unarchive:
+    #     src: "{{ entpack_dir }}{{ entpack_tar_file }}"
+    #     dest: "{{ entpack_dir }}"
+    #     remote_src: yes
+    #   when:
+    #     - tar_after_copy_details.stat.exists
+########################################################################################
 #    - name: "Copy Kernel Devel from Ansible-Control-Node"
 #      copy:
 #        src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
@@ -152,59 +140,69 @@
         dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
 
 
-    - name: "16 - Install Kernel Devel"
-      yum:
-        name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
-        allow_downgrade: yes
-        state: present
-    - name: "17 - Install Kernel Header"
-      yum:
-        name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
-        allow_downgrade: yes
-        state: present
+    # - name: "16 - Install Kernel Devel"
+    #   yum:
+    #     name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+    #     allow_downgrade: yes
+    #     state: present
+    # - name: "17 - Install Kernel Header"
+    #   yum:
+    #     name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+    #     allow_downgrade: yes
+    #     state: present
+
+# the epel-release must be removed for sps-prerequisites
     - name: "18 - Remove EPEL-Release-Repo"
       yum:
-        name: epel-release.noarch
-        state: absent
+        name: "epel-release.noarch"
+        state: "absent"
+
+# Disable firewall for easier setup
     - name: "19 - Stop and disable firewalld"
       service:
         name: firewalld
         state: stopped
-        enabled: false
+        enabled: "false"
+
+# Execute the install-file to install the sps-dependencies
     - name: "20 - Execute SpectrumScale Install-File"
       raw: "{{ item }}"
       with_items:
         - "echo '1' | {{ entpack_dir }}{{ sps_install_filename }}"
+
+# Execute the sps-setup only on one sps-node
     - name: "21 - Setup Spectrum-Scale-Installation-Node"
       raw: "{{ item }}"
       with_items:
         - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-    - name: "22 - Configure Spectrum-Scale"
-      raw: "{{ item }}"
-      with_items:
-        - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
-        - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
-        - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
-        - "{{ spectrumscale_cmd }} callhome disable"
-        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
-        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
-        - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
-        - "{{ spectrumscale_cmd }} enable smb nfs"
-        - "{{ spectrumscale_cmd }} config protocols -l"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
-    - name: "23 - Install Spectrum-Scale --precheck"
-      raw: "{{ spectrumscale_cmd }} install --precheck"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
-    - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
-      script: "spectrumscale-install-deploy.sh"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+
+
+    # - name: "22 - Configure Spectrum-Scale"
+    #   raw: "{{ item }}"
+    #   with_items:
+    #     - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
+    #     - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
+    #     - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
+    #     - "{{ spectrumscale_cmd }} callhome disable"
+    #     - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
+    #     - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
+    #     - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
+    #     - "{{ spectrumscale_cmd }} enable smb nfs"
+    #     - "{{ spectrumscale_cmd }} config protocols -l"
+    #     - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
+    #     - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
+    #     - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+    #   when: "'{{ sps_node1 }}' in inventory_hostname"
+    # - name: "23 - Install Spectrum-Scale --precheck"
+    #   raw: "{{ spectrumscale_cmd }} install --precheck"
+    #   when: "'{{ sps_node1 }}' in inventory_hostname"
+    # - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
+    #   script: "spectrumscale-install-deploy.sh"
+    #   when: "'{{ sps_node1 }}' in inventory_hostname"

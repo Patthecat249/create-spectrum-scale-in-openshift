@@ -46,8 +46,9 @@ network:
 
 domain: "home.local"
 
-spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
-sps_install_filename: "Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
+sps_version: "5.1.0.3"
+spectrumscale_cmd: "/usr/lpp/mmfs/{{sps_version}}/installer/spectrumscale"
+sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"
 sps_cluster_name: "sps.home.local"
 sps_setup_node_ip: "10.0.249.161"
 sps_ntp_ip1: "10.0.249.1"
@@ -67,7 +68,7 @@ dir_spectrumscalenodes: "/opt/sva/terraform/spectrumscale-nodes/"
 
 private_root_key: "/root/.ssh/id_rsa"
 entpack_dir: "/opt/sva/spectrumscale/"
-entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
+entpack_tar_file: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
 src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
 dest_nas_mount_path: "/mnt/spectrumscale"
 
