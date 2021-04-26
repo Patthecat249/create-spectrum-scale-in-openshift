@@ -18,7 +18,7 @@
           - bind-utils.x86_64
           - nfs-utils.x86_64
           - net-tools
-          - ntp.x86_64
+          - chrony.x86_64
           - cpp.x86_64
           - gcc.x86_64
           - gcc-c++.x86_64
