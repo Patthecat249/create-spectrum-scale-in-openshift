@@ -1,3 +1,18 @@
+# --- Spectrum-Nodes
+sps:
+  sps1:
+    hostname: "sps-patrick1"
+    fqdn: "{{sps.sps1.hostname}}.{{domain}}"
+    ip: "10.0.249.161"
+  sps2:
+    hostname: "sps-patrick2"
+    fqdn: "{{sps.sps2.hostname}}.{{domain}}"
+    ip: "10.0.249.162"
+  sps3:
+    hostname: "sps-patrick3"
+    fqdn: "{{sps.sps3.hostname}}.{{domain}}"
+    ip: "10.0.249.163"
+
 # --- VMware Settings --- #
 # VMware-Settings
 vsphere_server: "vcenter.home.local"
@@ -51,17 +66,3 @@ entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
 src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
 dest_nas_mount_path: "/mnt/spectrumscale"
 
-
-sps:
-  sps1:
-    hostname: "sps1"
-    fqdn: "{{sps.sps1.hostname}}.{{domain}}"
-    ip: "10.0.249.161"
-  sps2:
-    hostname: "sps2"
-    fqdn: "{{sps.sps2.hostname}}.{{domain}}"
-    ip: "10.0.249.162"
-  sps3:
-    hostname: "sps3"
-    fqdn: "{{sps.sps3.hostname}}.{{domain}}"
-    ip: "10.0.249.163"
