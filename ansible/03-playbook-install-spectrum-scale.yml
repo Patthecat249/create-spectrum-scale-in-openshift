@@ -30,8 +30,10 @@
     - name: "02b - Create Shell-Script"
       template:
         src: "spectrumscale-install-deploy.sh.j2"
-        dest: "spectrumscale-install-deploy.sh"
-
+        dest: "{{entpack_dir}}spectrumscale-install-deploy.sh"
+        mode: "0755"
+      tags:
+        - retry
 
     - name: "03 - Check if folder {{ entpack_dir }} exists"
       stat:
@@ -208,5 +210,7 @@
 
 # Let the deployment begin
     - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
-      script: "spectrumscale-install-deploy.sh"
+      script: "{{entpack_dir}}spectrumscale-install-deploy.sh"
       when: "'{{ sps_node1 }}' in inventory_hostname"
+      tags:
+        - retry
