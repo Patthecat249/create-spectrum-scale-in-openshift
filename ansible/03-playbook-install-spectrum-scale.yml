@@ -203,6 +203,15 @@
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
+
+    - name: "22b - Disable rpcbind-service as prereq from SPS"
+      service:
+        name: "rpcbind"
+        enabled: "false"
+        state: "stopped"
+      tags:
+        - retry
+
 # Let the prechecker run
     - name: "23 - Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
@@ -210,7 +219,7 @@
 
 # Let the deployment begin
     - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
-      raw: "{{entpack_dir}}spectrumscale-install-deploy.sh"
+      command: "{{entpack_dir}}spectrumscale-install-deploy.sh"
       delegate_to: "{{sps_node1}}"
       tags:
         - retry
