@@ -39,9 +39,9 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
    Die Playbooks führen die Installation und Konfiguration von Spectrum-Scale durch.
 
    ```bash
-   ansible-playbook 02-playbook-ssh-prepare-setup.yml
-   ansible-playbook 03-playbook-install-spectrum-scale.yml
-   ansible-playbook 04-playbook-create-spectrum-scale-user.yml
+   cd ~/git/spectrum-scale/ansible && ansible-playbook 02-playbook-ssh-prepare-setup.yml
+   cd ~/git/spectrum-scale/ansible && ansible-playbook 03-playbook-install-spectrum-scale.yml
+   cd ~/git/spectrum-scale/ansible && ansible-playbook 04-playbook-create-spectrum-scale-user.yml
    ```
    
 
