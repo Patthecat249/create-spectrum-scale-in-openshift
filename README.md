@@ -6,14 +6,15 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 ## How to use
 1. #### Download Spectrum-Scale-Install-File from IBM Fix Central
 https://www.ibm.com/support/fixcentral/
-```bash
-Product Group: System Storage
-Select from System Storage: Storage Software
-Select from Storage software: Software defined storage
-Select from Software defined storage: IBM Spectrum Scale
-Installed Version: 5.1.0
-Platform: Linux 64-bit,x86_64
+**Product Group:** `System Storage`
+**Select from System Storage:** Storage Software
+**Select from Storage software:** Software defined storage
+**Select from Software defined storage:** IBM Spectrum Scale
+**Installed Version:** 5.1.0
+**Platform:** Linux 64-bit,x86_64
 
+
+```bash
 Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
 ```
 
