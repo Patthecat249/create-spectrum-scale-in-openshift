@@ -4,6 +4,7 @@
     - "./vars/vars.yaml"
   tasks:
     - name: "01 - Copy /etc/hosts from control-node to managed-hosts"
+      copy:
         src: "/etc/hosts"
         dest: "/etc/hosts"
         force: "true"
