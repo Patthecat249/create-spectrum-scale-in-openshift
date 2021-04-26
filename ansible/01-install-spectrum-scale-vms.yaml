@@ -7,17 +7,27 @@
     - "./vars/vars.yaml"
  
   tasks:
-    - name: "00 - Cleanup /etc/hosts"
+    - name: "01 - Cleanup former SPS-IP-adresses from /etc/hosts"
       lineinfile: 
         path: "/etc/hosts"
         regexp: "{{ item }}"
         state: "absent"
       with_items:
-        - "{{sps.sps1.ip}}"
-        - "{{sps.sps2.ip}}"
-        - "{{sps.sps3.ip}}"
+        - "{{sps.sps1.hostname}}"
+        - "{{sps.sps2.hostname}}"
+        - "{{sps.sps3.hostname}}"
 
-    - name: "01 - Erstelle /etc/hosts-Einträge"
+    - name: "02 - Cleanup former SPS-Hostnames from /etc/hosts"
+      lineinfile: 
+        path: "/etc/hosts"
+        regexp: "{{ item }}"
+        state: "absent"
+      with_items:
+        - "{{sps.sps1.hostname}}"
+        - "{{sps.sps2.hostname}}"
+        - "{{sps.sps3.hostname}}"
+
+    - name: "03 - Erstelle /etc/hosts-Einträge"
       lineinfile: 
         path: "/etc/hosts"
         line: "{{ item }}"
@@ -28,7 +38,7 @@
         - "{{sps.sps3.ip}}     {{sps.sps3.fqdn}} {{sps.sps3.hostname}}"
 
 # Erstelle Arbeitsverzeichnisse
-    - name: "02 - Create Terraform-Working-Directory for Spectrum-Scale-Nodes"
+    - name: "04 - Create Terraform-Working-Directory for Spectrum-Scale-Nodes"
       file:
         path: "{{ item }}"
         state: "directory"
@@ -38,12 +48,12 @@
     
 # Erstelle die Terraform-Files "main.tf/output.tf"-files
 # main.tf
-    - name: "03 - Create main.tf-file"
+    - name: "05 - Create main.tf-file"
       template:
         src: "../terraform/install-spectrumscale/main.tf.j2"
         dest: "{{ dir_spectrumscalenodes }}main.tf"
     
 # Erzeuge die virtuelle Maschine
-    - name: "04 - Create virtual machines ({{ sps_node1 }}, {{ sps_node2 }}, {{ sps_node3 }}) with terraform"
+    - name: "06 - Create virtual machines ({{ sps_node1 }}, {{ sps_node2 }}, {{ sps_node3 }}) with terraform"
       raw: "cd {{ dir_spectrumscalenodes }} && /usr/local/bin/terraform init && /usr/local/bin/terraform apply -auto-approve"
 
