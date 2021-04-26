@@ -11,7 +11,7 @@
         state: present
 
 # Install Software packages
-    - name: "02a - Install necassary software programs"
+    - name: "02 - Install necassary software programs"
       become: "true"
       yum:
         name:
@@ -27,7 +27,7 @@
           - elfutils-devel.x86_64
         state: "present"
 
-    - name: "02b - Create Shell-Script"
+    - name: "03 - Create Shell-Script"
       template:
         src: "spectrumscale-install-deploy.sh.j2"
         dest: "{{entpack_dir}}spectrumscale-install-deploy.sh"
@@ -36,7 +36,7 @@
       tags:
         - retry
 
-    - name: "03 - Check if folder {{ entpack_dir }} exists"
+    - name: "04 - Check if folder {{ entpack_dir }} exists"
       stat:
         path: "{{ entpack_dir }}"
       register: folder_details
@@ -45,7 +45,7 @@
     #   debug:
     #     msg: "{{ folder_details }}"
 
-    - name: "04 - Create Directoy {{ entpack_dir }}"
+    - name: "05 - Create Directoy {{ entpack_dir }}"
       file:
         recurse: "true"
         path: "{{ item }}"
@@ -57,7 +57,7 @@
       when:
         - not folder_details.stat.exists
     
-    - name: "05 - Spectrum-Scale-Mount-Verzeichnis erstellen"
+    - name: "06 - Spectrum-Scale-Mount-Verzeichnis erstellen"
       file:
         recurse: "true"
         path: "{{ item }}"
@@ -65,7 +65,7 @@
       with_items:
         - "{{ dest_nas_mount_path }}"
 
-    - name: "06 - Check if {{ entpack_dir }}{{ sps_install_filename }} exists on Remote-Machine in Entpack_Directory"
+    - name: "07 - Check if {{ entpack_dir }}{{ sps_install_filename }} exists on Remote-Machine in Entpack_Directory"
       stat:
         path: "{{ entpack_dir }}{{ sps_install_filename }}"
       register: tar_details
@@ -75,113 +75,63 @@
     #     msg: "{{ tar_details }}"
 
 # Copy sps_install_filename from control-node to managed-nodes
-    - name: "07 - Copy {{sps_install_filename}} from control-node to managed-hosts"
+    - name: "08 - Copy {{sps_install_filename}} from control-node to managed-hosts"
       copy:
         src: "{{entpack_dir}}{{sps_install_filename}}"
         dest: "{{entpack_dir}}{{sps_install_filename}}"
         mode: "0755"
 
-
-########################################################################################
-    # - name: "08 - Mounting NFS-Share"
-    #   mount:
-    #     fstype: nfs
-    #     opts: defaults
-    #     state: mounted
-    #     src: "{{ src_nas_mount }}"
-    #     path: "{{ dest_nas_mount_path }}"
-    #     backup: yes
-    #   when:
-    #     - not tar_details.stat.exists
-
-    # - name: "09 - Wait a Second..."
-    #   wait_for:
-    #     timeout: 1
-
-    # - name: "10 - Copy TAR-File from NFS-Server to SPS-Nodes"
-    #   copy:
-    #     src: "{{ dest_nas_mount_path }}/spectrumscale/{{ sps_install_filename }}"
-    #     dest: "{{ entpack_dir }}"
-    #     remote_src: yes
-    #   when:
-    #     - not tar_details.stat.exists
-
-    # - name: "11 - Unmounting NFS-Share"
-    #   mount:
-    #     fstype: nfs
-    #     opts: defaults
-    #     state: absent
-    #     src: "{{ src_nas_mount }}"
-    #     path: "{{ dest_nas_mount_path }}"
-    #     backup: yes
-    #   when:
-    #     - not tar_details.stat.exists
-
-    # - name: "12 - Check if TAR-File exists on Remote-Machine"
-    #   stat:
-    #     path: "{{ entpack_dir }}{{ entpack_tar_file }}"
-    #   register: tar_after_copy_details
-
-    # - name: "13 - Extract Tar-File"
-    #   unarchive:
-    #     src: "{{ entpack_dir }}{{ entpack_tar_file }}"
-    #     dest: "{{ entpack_dir }}"
-    #     remote_src: yes
-    #   when:
-    #     - tar_after_copy_details.stat.exists
-########################################################################################
-
-    - name: "14 - Download Kernel-Devel"
+    - name: "09 - Download Kernel-Devel"
       get_url:
         url: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_devel}}"
         dest: "{{ entpack_dir }}/{{kernel_devel}}"
 
 
-    - name: "15 - Download Kernel-Header"
+    - name: "10 - Download Kernel-Header"
       get_url:
         url: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/kernel-headers-4.18.0-240.el8.x86_64.rpm"
         dest: "{{ entpack_dir }}/{{kernel_header}}"
 
 
-    - name: "16 - Install Kernel Devel"
+    - name: "11 - Install Kernel Devel"
       yum:
         name: "{{ entpack_dir }}/{{kernel_devel}}"
         allow_downgrade: yes
         state: present
-    - name: "17 - Install Kernel Header"
+    - name: "12 - Install Kernel Header"
       yum:
         name: "{{ entpack_dir }}/{{kernel_header}}"
         allow_downgrade: yes
         state: present
 
 # the epel-release must be removed for sps-prerequisites
-    - name: "18 - Remove EPEL-Release-Repo"
+    - name: "13 - Remove EPEL-Release-Repo"
       yum:
         name: "epel-release.noarch"
         state: "absent"
 
 # Disable firewall for easier setup
-    - name: "19 - Stop and disable firewalld"
+    - name: "14 - Stop and disable firewalld"
       service:
         name: firewalld
         state: stopped
         enabled: "false"
 
 # Execute the install-file to install the sps-dependencies
-    - name: "20 - Execute SpectrumScale Install-File"
+    - name: "15 - Execute SpectrumScale Install-File to extract gpfs-binaries, rpm-files, etc."
       raw: "{{ item }}"
       with_items:
         - "echo '1' | {{ entpack_dir }}{{ sps_install_filename }}"
 
 # Execute the sps-setup only on one sps-node
-    - name: "21 - Setup Spectrum-Scale-Installation-Node"
+    - name: "16 - Setup Spectrum-Scale-Installation-Node"
       raw: "{{ item }}"
       with_items:
         - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the Spectrum-Scale-Cluster
-    - name: "22 - Configure Spectrum-Scale"
+    - name: "17 - Configure Spectrum-Scale"
       raw: "{{ item }}"
       with_items:
         - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
@@ -203,23 +153,55 @@
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
+  
+    - name: "18 - Install GPFS-RPM-Packages"
+      yum:
+        name:
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.base-5.1.0-3.x86_64.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gskit-8.0.55-12.x86_64.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.license.std-5.1.0-3.x86_64.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.java-5.1.0-3.x86_64.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gpl-5.1.0-3.noarch.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.docs-5.1.0-3.noarch.rpm"
+        state: "present"
+      tags:
+        - rpms
+
+    - name: "19 - Install GPFS-RPM-Packages for GUI-Node"
+      yum:
+        name:
+          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.0-3.el8.x86_64.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gui-5.1.0-3.noarch.rpm"
+        state: "present"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
+      tags:
+        - rpms
 
 
-    - name: "22b - Disable rpcbind-service as prereq from SPS"
+
+# Disable the rpcbind-service and socket
+    - name: "18 - Disable rpcbind-service as prereq from SPS"
       service:
         name: "rpcbind"
         enabled: "false"
         state: "stopped"
       tags:
         - retry
+    - name: "19 - Disable rpcbind-socket as prereq from SPS"
+      service:
+        name: "rpcbind.socket"
+        enabled: "false"
+        state: "stopped"
+      tags:
+        - retry
 
 # Let the prechecker run
-    - name: "23 - Install Spectrum-Scale --precheck"
+    - name: "20 - Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Let the deployment begin
-    - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
+    - name: "21 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "{{entpack_dir}}spectrumscale-install-deploy.sh"
       when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
