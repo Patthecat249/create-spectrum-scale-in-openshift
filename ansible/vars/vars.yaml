@@ -1,3 +1,24 @@
+# --- VMware Settings --- #
+# VMware-Settings
+vsphere_server: "vcenter.home.local"
+vsphere_user: "administrator@home.local"
+vsphere_pass: "Test1234!"
+vsphere_cluster: "cluster-home"
+vsphere_datacenter: "dc-home"
+vsphere_rp: "rp-home"
+vsphere_datastore: "openshift_storage"
+vsphere_network: "dpg-openshift-12"
+vsphere_network_home: "dpg-home-prod"
+vsphere_folder: "/dc-home/vm/openshift"
+vsphere_sps_cpu: "8"
+vsphere_sps_ram: "16384"
+vsphere_guest_id: "centos8_64Guest"
+vsphere_vm_boot_delay: "90000"
+vsphere_hardware_version: "13"
+vsphere_hardware_version_non_coreos: "14"
+vsphere_vmtemplate_name: "centos83-template"
+
+
 domain: "home.local"
 
 spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
@@ -16,6 +37,8 @@ sps_filesystem1: "/mnt/gpfs/"
 sps_filesystem2: "/mnt/patrick/"
 sps_fs1: "gpfs"
 sps_fs2: "patrick"
+
+dir_spectrumscalenodes: "/opt/sva/terraform/spectrumscale-nodes/"
 
 private_root_key: "/root/.ssh/id_rsa"
 entpack_dir: "/opt/sva/spectrumscale/"
