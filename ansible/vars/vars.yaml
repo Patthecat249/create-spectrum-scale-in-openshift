@@ -1,16 +1,21 @@
-# --- Spectrum-Nodes
+# --- Spectrum-Node-Names
+node1: "sps-patrick1"
+node2: "sps-patrick2"
+node3: "sps-patrick3"
+
+# --- Spectrum-Scale detailed
 sps:
   sps1:
-    hostname: "sps-patrick1"
-    fqdn: "{{sps.sps1.hostname}}.{{domain}}"
+    hostname: "{{node1}}"
+    fqdn: "{{node1}}.{{domain}}"
     ip: "10.0.249.161"
   sps2:
-    hostname: "sps-patrick2"
-    fqdn: "{{sps.sps2.hostname}}.{{domain}}"
+    hostname: "{{node2}}"
+    fqdn: "{{node2}}.{{domain}}"
     ip: "10.0.249.162"
   sps3:
-    hostname: "sps-patrick3"
-    fqdn: "{{sps.sps3.hostname}}.{{domain}}"
+    hostname: "{{node3}}"
+    fqdn: "{{node3}}.{{domain}}"
     ip: "10.0.249.163"
 
 # --- VMware Settings --- #
