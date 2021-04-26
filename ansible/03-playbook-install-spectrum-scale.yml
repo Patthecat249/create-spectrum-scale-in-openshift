@@ -32,6 +32,7 @@
         src: "spectrumscale-install-deploy.sh.j2"
         dest: "{{entpack_dir}}spectrumscale-install-deploy.sh"
         mode: "0755"
+      delegate_to: 127.0.0.1
       tags:
         - retry
 
@@ -220,6 +221,7 @@
 # Let the deployment begin
     - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       command: "{{entpack_dir}}spectrumscale-install-deploy.sh"
-      delegate_to: "{{sps_node1}}"
+      # delegate_to: "{{sps_node1}}"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
         - retry
