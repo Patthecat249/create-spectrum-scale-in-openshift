@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-rm -f /root/.ssh/known_hosts
+echo "" > /root/.ssh/known_hosts
 # Setup for SPS-Node#1
 sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1
 sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local
