@@ -1,9 +1,0 @@
-- name: "Playbook - Create Spectrum-Scale-Users"
-  hosts: "sps3.home.local"
-  gather_facts: false
-  tasks:
-    - name: "Create User on GUI-Node"
-      raw: "{{ item }}"
-      with_items:
-        - "/usr/lpp/mmfs/gui/cli/mkuser csiadmin -p Test1234 -g CsiAdmin"
-        - "/usr/lpp/mmfs/gui/cli/mkuser patrick -p Test1234 -g SecurityAdmin"

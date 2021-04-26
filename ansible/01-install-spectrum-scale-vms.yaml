@@ -1,0 +1,38 @@
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook - Install three Spectrum-Scale-VMs"
+  become: "true"
+  become_user: "root"
+  hosts: 127.0.0.1
+  gather_facts: "false"
+  vars_files:
+    - "./vars/vars.yaml"
+ 
+  tasks:
+    - name: "01 - Erstelle /etc/hosts-Einträge"
+      lineinfile: 
+        path: "/etc/hosts"
+        line: "{{ item }}"
+      with_items:
+        - "{{sps.sps1.ip}}     {{sps.sps1.fqdn}} {{sps.sps1.hostname}}"
+        - "{{sps.sps2.ip}}     {{sps.sps2.fqdn}} {{sps.sps2.hostname}}"
+        - "{{sps.sps3.ip}}     {{sps.sps3.fqdn}} {{sps.sps3.hostname}}"
+
+# Erstelle Arbeitsverzeichnisse
+    - name: "02 - Create Terraform-Working-Directory for Spectrum-Scale-Nodes"
+      file:
+        path: "{{ item }}"
+        state: "directory"
+        recurse: "true"
+      with_items:
+        - "{{ dir_spectrumscalenodes }}"
+    
+# Erstelle die Terraform-Files "main.tf/output.tf"-files
+# main.tf
+    - name: "03 - Create main.tf-file"
+      template:
+        src: "./terraform/install-spectrumscale/main.tf.j2"
+        dest: "{{ dir_spectrumscalenodes }}main.tf"
+    
+# Erzeuge die virtuelle Maschine
+#    - name: "04 - Create virtual machines ({{ sps_node1 }}, {{ sps_node2 }}, {{ sps_node3 }}) with terraform"
+#      raw: "cd {{ dir_spectrumscalenodes }} && /usr/local/bin/terraform init && /usr/local/bin/terraform apply -auto-approve"
+

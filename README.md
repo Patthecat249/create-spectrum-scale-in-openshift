@@ -22,9 +22,7 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 2. #### Erstellen der virtuellen Maschinen mit terraform
 
    ```bash
-   cd ~/git/ocp43-patrick/install-spectrumscale
-   terraform plan -out=spectrum-scale.out
-   terraform apply "spectrum-scale.out"
+   cd ~/git/spectrum-scale/ansible/ansible-playbook 01-install-spectrum-scale-vms.yaml
    ```
 
    
