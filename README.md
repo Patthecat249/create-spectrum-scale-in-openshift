@@ -5,17 +5,24 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 
 ## How to use
 1. #### Download Spectrum-Scale-Install-File from IBM Fix Central
-https://www.ibm.com/support/fixcentral/
-**Product Group:** `System Storage`
-**Select from System Storage:** Storage Software
-**Select from Storage software:** Software defined storage
-**Select from Software defined storage:** IBM Spectrum Scale
-**Installed Version:** 5.1.0
-**Platform:** Linux 64-bit,x86_64
+  https://www.ibm.com/support/fixcentral/
+  **Product Group:** `System Storage`
+
+  **Select from System Storage:** `Storage Software`
+
+  **Select from Storage software:** `Software defined storage`
+
+  **Select from Software defined storage:** `IBM Spectrum Scale`
+
+  **Installed Version:** `5.1.0`
+
+  **Platform:** `Linux 64-bit,x86_64`
+
+  **Download:** `Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install`
 
 
 ```bash
-Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
+copy downloaded-file to ansible-control-node into directory /opt/sva/spectrumscale/
 ```
 
 2. #### Customize variables in "vars/vars.yaml"
@@ -49,7 +56,6 @@ You have to customize all variables you like to in the central vars_file. Especi
    cd ~/git/spectrum-scale/ansible && ./initial-ssh-setup.sh
    ```
    
-
 6. #### Ausführen der Ansible-Playbooks
 
    Die Playbooks führen die Installation und Konfiguration von Spectrum-Scale durch.
@@ -60,7 +66,6 @@ You have to customize all variables you like to in the central vars_file. Especi
    cd ~/git/spectrum-scale/ansible && ansible-playbook 04-playbook-create-spectrum-scale-user.yml
    ```
    
-
 6. #### Login on GUI
 
    ```bash
