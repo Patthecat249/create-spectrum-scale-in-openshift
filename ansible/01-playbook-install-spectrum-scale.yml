@@ -61,7 +61,7 @@
     - name: "04 - DEBUG"
       debug:
         msg: "{{ folder_details }}"
-    - name: "05 - Spectrum-Scale-Entpack-Verzeichnis erstellen"
+    - name: "05a - Spectrum-Scale-Entpack-Verzeichnis erstellen"
       file:
         recurse: true
         path: "{{ item }}"
@@ -72,6 +72,15 @@
         - "{{ sps_filesystem2 }}"
       when:
         - not folder_details.stat.exists
+    
+    - name: "05b - Spectrum-Scale-Mount-Verzeichnis erstellen"
+      file:
+        recurse: true
+        path: "{{ item }}"
+        state: "directory"
+      with_items:
+        - "{{ dest_nas_mount_path }}"
+
     - name: "06 - Check if TAR-File exists on Remote-Machine in Entpack_Directory"
       stat:
         path: "{{ entpack_dir }}{{ entpack_tar_file }}"
