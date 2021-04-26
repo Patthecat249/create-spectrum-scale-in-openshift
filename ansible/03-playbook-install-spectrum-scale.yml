@@ -11,7 +11,7 @@
         state: present
 
 # Install Software packages
-    - name: "02 - Install necassary software programs"
+    - name: "02a - Install necassary software programs"
       become: "true"
       yum:
         name:
@@ -26,6 +26,12 @@
           - elfutils.x86_64
           - elfutils-devel.x86_64
         state: "present"
+
+    - name: "02b - Create Shell-Script"
+      template:
+        src: "spectrumscale-install-deploy.sh.j2"
+        dest: "spectrumscale-install-deploy.sh"
+
 
     - name: "03 - Check if folder {{ entpack_dir }} exists"
       stat:
