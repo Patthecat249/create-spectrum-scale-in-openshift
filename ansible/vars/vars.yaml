@@ -54,14 +54,14 @@ dest_nas_mount_path: "/mnt/spectrumscale"
 
 sps:
   sps1:
-    hostname: "test-sps"
-    fqdn: "test-sps.{{domain}}"
-    ip: "10.0.249.168"
+    hostname: "sps1"
+    fqdn: "{{sps.sps1.hostname}}.{{domain}}"
+    ip: "10.0.249.161"
   sps2:
     hostname: "sps2"
-    fqdn: "sps2.{{domain}}"
+    fqdn: "{{sps.sps2.hostname}}.{{domain}}"
     ip: "10.0.249.162"
   sps3:
     hostname: "sps3"
-    fqdn: "sps3.{{domain}}"
+    fqdn: "{{sps.sps3.hostname}}.{{domain}}"
     ip: "10.0.249.163"

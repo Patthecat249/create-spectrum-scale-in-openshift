@@ -7,6 +7,16 @@
     - "./vars/vars.yaml"
  
   tasks:
+    - name: "00 - Cleanup /etc/hosts"
+      lineinfile: 
+        path: "/etc/hosts"
+        regexp: "{{ item }}"
+        state: "absent"
+      with_items:
+        - "{{sps.sps1.ip}}"
+        - "{{sps.sps2.ip}}"
+        - "{{sps.sps3.ip}}"
+
     - name: "01 - Erstelle /etc/hosts-Einträge"
       lineinfile: 
         path: "/etc/hosts"
@@ -34,6 +44,6 @@
         dest: "{{ dir_spectrumscalenodes }}main.tf"
     
 # Erzeuge die virtuelle Maschine
-#    - name: "04 - Create virtual machines ({{ sps_node1 }}, {{ sps_node2 }}, {{ sps_node3 }}) with terraform"
-#      raw: "cd {{ dir_spectrumscalenodes }} && /usr/local/bin/terraform init && /usr/local/bin/terraform apply -auto-approve"
+    - name: "04 - Create virtual machines ({{ sps_node1 }}, {{ sps_node2 }}, {{ sps_node3 }}) with terraform"
+      raw: "cd {{ dir_spectrumscalenodes }} && /usr/local/bin/terraform init && /usr/local/bin/terraform apply -auto-approve"
 

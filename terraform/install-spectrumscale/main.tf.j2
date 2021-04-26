@@ -46,7 +46,7 @@ variable "vm_name_sps3" {
 }
 
 variable "sps_guest_id_tag" {
-  default = "centos7_64Guest"
+  default = "centos8_64Guest"
 }
 
 data "vsphere_virtual_machine" "template" {
@@ -55,7 +55,7 @@ data "vsphere_virtual_machine" "template" {
 }
 
 ########################
-# --- Create VM ocprouter --- #
+# --- Create VM sps1 --- #
 resource "vsphere_virtual_machine" "{{sps.sps1.hostname}}" {
   name = "{{sps.sps1.hostname}}"
   folder = "{{vsphere_folder}}"
@@ -107,114 +107,108 @@ resource "vsphere_virtual_machine" "{{sps.sps1.hostname}}" {
   }
 }
 
-########################
 
-# --- Create VM Spectrum-Scale-Node1 --- #
-#resource "vsphere_virtual_machine" "{{sps.sps1.hostname}}" {
-#  name = var.vm_name_sps1
-#  folder = var.ocp-folder
-#  guest_id = var.sps_guest_id_tag
-#  resource_pool_id = data.vsphere_resource_pool.pool.id
-#  firmware = "bios"
-#  datastore_id = data.vsphere_datastore.datastore.id
-#  num_cpus = {{vsphere_sps_cpu}}
-#  memory = {{vsphere_sps_ram}}
-#  wait_for_guest_ip_timeout = 10
-#  network_interface {
-#    network_id = data.vsphere_network.network.id
-#    adapter_type = "vmxnet3"
-#    use_static_mac = true
-#    mac_address = "00:50:56:a6:ff:fd"
-#  }
-#  disk {
-#    label = "rootvolume"
-#    size  = "120"
-#    thin_provisioned  = "false"
-#  }
-#  disk {
-#    label = "spsvolume1"
-#    size  = "200"
-#    thin_provisioned  = "false"
-#    unit_number = 1
-#  }
-#  disk {
-#    label = "spsvolume4"
-#    size  = "50"
-#    thin_provisioned  = "false"
-#    unit_number = 2
-#  }
-#}
+# ---
+# --- Create VM sps2 --- #
+resource "vsphere_virtual_machine" "{{sps.sps2.hostname}}" {
+  name = "{{sps.sps2.hostname}}"
+  folder = "{{vsphere_folder}}"
+  guest_id = "{{vsphere_guest_id}}"
+  resource_pool_id = data.vsphere_resource_pool.pool.id
+  firmware = "bios"
+  datastore_id = data.vsphere_datastore.datastore.id
+  num_cpus = "{{vsphere_sps_cpu}}"
+  memory = "{{vsphere_sps_ram}}"
+  boot_delay = 0
+  wait_for_guest_ip_timeout = 0
+  wait_for_guest_net_timeout = 0
+  hardware_version = {{ vsphere_hardware_version_non_coreos }}
+  network_interface {
+    network_id = data.vsphere_network.network_home.id
+    adapter_type = "vmxnet3"
+  }
+  disk {
+    label = "rootvolume"
+    size  = "120"
+    thin_provisioned  = "false"
+  }
+  disk {
+    label = "spsvolume2"
+    size  = "200"
+    thin_provisioned  = "false"
+    unit_number = 1
+  }
+  disk {
+    label = "spsvolume5"
+    size  = "50"
+    thin_provisioned  = "false"
+    unit_number = 2
+  }
+  clone {
+    template_uuid = data.vsphere_virtual_machine.template.id # CentOS 8.3
+    customize {
+      linux_options {
+        host_name = "{{sps.sps2.hostname}}"
+        domain = "{{domain}}"
+      }
+      network_interface {
+        ipv4_address = "{{sps.sps2.ip}}"
+        ipv4_netmask = "24"
+      }
+      ipv4_gateway = "{{network.router.ip}}"
+      dns_server_list = ["{{ network.dns.ip }}"]
+    }
+  }
+}
 
-
-
-
-# --- Create VM Spectrum-Scale-Node2 --- #
-#resource "vsphere_virtual_machine" "{{sps.sps2.hostname}}" {
-#  name = var.vm_name_sps2
-#  folder = var.ocp-folder
-#  guest_id = var.sps_guest_id_tag
-#  resource_pool_id = data.vsphere_resource_pool.pool.id
-#  firmware = "bios"
-#  datastore_id = data.vsphere_datastore.datastore.id
-#  num_cpus = {{vsphere_sps_cpu}}
-#  memory = {{vsphere_sps_ram}}
-#  wait_for_guest_ip_timeout = 10
-#  network_interface {
-#    network_id = data.vsphere_network.network.id
-#    adapter_type = "vmxnet3"
-#   use_static_mac = true
-#    mac_address = "00:50:56:a6:ff:fe"
-#  }
-# disk {
-#    label = "rootvolume"
-#    size  = "120"
-#    thin_provisioned  = "false"
-#  }
-# disk {
-#    label = "spsvolume2"
-#    size  = "200"
-#    thin_provisioned  = "false"
-#    unit_number = 1
-#  }
-# disk {
-#    label = "spsvolume5"
-#    size  = "50"
-#    thin_provisioned  = "false"
-#    unit_number = 2
-#  }
-#}
-# --- Create VM Spectrum-Scale-Node3 --- #
-#resource "vsphere_virtual_machine" "{{sps.sps3.hostname}}" {
-#  name = var.vm_name_sps3
-#  folder = var.ocp-folder
-#  guest_id = var.sps_guest_id_tag
-#  resource_pool_id = data.vsphere_resource_pool.pool.id
-#  firmware = "bios"
-#  datastore_id = data.vsphere_datastore.datastore.id
-#  num_cpus = {{vsphere_sps_cpu}}
-#  memory = {{vsphere_sps_ram}}
-#  wait_for_guest_ip_timeout = 10
-#  network_interface {
-#    network_id = data.vsphere_network.network.id
-#    adapter_type = "vmxnet3"
-#    use_static_mac = true
-#    mac_address = "00:50:56:a6:ff:ff"
-#  }
-#  disk {
-#    label = "rootvolume"
-#    size  = "120"
-#    thin_provisioned  = "false"
-#  }
-#  disk {
-#    label = "spsvolume3"
-#    size  = "200"
-#    thin_provisioned  = "false"
-#    unit_number = 1
-#  }
-#  disk {
-#    label = "spsvolume6"
-#    size  = "50"
-#    thin_provisioned  = "false"
-#    unit_number = 2
-#  }
-#}
+# --- Create VM sps3 --- #
+resource "vsphere_virtual_machine" "{{sps.sps3.hostname}}" {
+  name = "{{sps.sps3.hostname}}"
+  folder = "{{vsphere_folder}}"
+  guest_id = "{{vsphere_guest_id}}"
+  resource_pool_id = data.vsphere_resource_pool.pool.id
+  firmware = "bios"
+  datastore_id = data.vsphere_datastore.datastore.id
+  num_cpus = "{{vsphere_sps_cpu}}"
+  memory = "{{vsphere_sps_ram}}"
+  boot_delay = 0
+  wait_for_guest_ip_timeout = 0
+  wait_for_guest_net_timeout = 0
+  hardware_version = {{ vsphere_hardware_version_non_coreos }}
+  network_interface {
+    network_id = data.vsphere_network.network_home.id
+    adapter_type = "vmxnet3"
+  }
+  disk {
+    label = "rootvolume"
+    size  = "120"
+    thin_provisioned  = "false"
+  }
+  disk {
+    label = "spsvolume3"
+    size  = "200"
+    thin_provisioned  = "false"
+    unit_number = 1
+  }
+  disk {
+    label = "spsvolume6"
+    size  = "50"
+    thin_provisioned  = "false"
+    unit_number = 2
+  }
+  clone {
+    template_uuid = data.vsphere_virtual_machine.template.id # CentOS 8.3
+    customize {
+      linux_options {
+        host_name = "{{sps.sps3.hostname}}"
+        domain = "{{domain}}"
+      }
+      network_interface {
+        ipv4_address = "{{sps.sps3.ip}}"
+        ipv4_netmask = "24"
+      }
+      ipv4_gateway = "{{network.router.ip}}"
+      dns_server_list = ["{{ network.dns.ip }}"]
+    }
+  }
+}
