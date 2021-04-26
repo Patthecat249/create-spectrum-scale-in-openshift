@@ -173,7 +173,7 @@
           - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.0-3.el8.x86_64.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gui-5.1.0-3.noarch.rpm"
         state: "present"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "'{{ sps_node3 }}' in inventory_hostname"
       tags:
         - rpms
 
