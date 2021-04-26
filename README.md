@@ -22,7 +22,7 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 2. #### Erstellen der virtuellen Maschinen mit terraform
 
    ```bash
-   cd ~/git/spectrum-scale/ansible/ansible-playbook 01-install-spectrum-scale-vms.yaml
+   cd ~/git/spectrum-scale/ansible/ && ansible-playbook 01-install-spectrum-scale-vms.yaml
    ```
 
    
@@ -30,10 +30,8 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 3. #### Initiale Ansible-Control-Node-Konfiguration
 
    ```bash
-   cd ~/git/spectrum-scale/ansible
-   ./initial-ssh-setup.sh
+   cd ~/git/spectrum-scale/ansible && ./initial-ssh-setup.sh
    ```
-
    
 
 4. #### Ausführen der Ansible-Playbooks
@@ -41,11 +39,10 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
    Die Playbooks führen die Installation und Konfiguration von Spectrum-Scale durch.
 
    ```bash
-   ansible-playbook 00-playbook-ssh-prepare-setup.yml
-   ansible-playbook 01-playbook-install-spectrum-scale.yml
-   ansible-playbook 02-playbook-create-spectrum-scale-user.yml
+   ansible-playbook 02-playbook-ssh-prepare-setup.yml
+   ansible-playbook 03-playbook-install-spectrum-scale.yml
+   ansible-playbook 04-playbook-create-spectrum-scale-user.yml
    ```
-
    
 
 5. #### Login on GUI
