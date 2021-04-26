@@ -30,7 +30,7 @@
 # main.tf
     - name: "03 - Create main.tf-file"
       template:
-        src: "./terraform/install-spectrumscale/main.tf.j2"
+        src: "../terraform/install-spectrumscale/main.tf.j2"
         dest: "{{ dir_spectrumscalenodes }}main.tf"
     
 # Erzeuge die virtuelle Maschine
