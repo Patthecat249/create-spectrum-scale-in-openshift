@@ -26,7 +26,7 @@ data "vsphere_datastore" "datastore" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
-data "vsphere_network" "network" {
+data "vsphere_network" "network_home" {
   name = "{{vsphere_network_home}}"
   datacenter_id = data.vsphere_datacenter.dc.id
 }
