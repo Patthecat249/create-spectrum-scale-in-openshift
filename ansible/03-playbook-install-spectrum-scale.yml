@@ -22,6 +22,7 @@
           - cpp.x86_64
           - gcc.x86_64
           - gcc-c++.x86_64
+          - python3
         state: "present"
 
     - name: "03 - Check if folder {{ entpack_dir }} exists"
