@@ -1,0 +1,14 @@
+domain: "home.local"
+sps:
+  sps1:
+    hostname: "sps1"
+    fqdn: "sps1.{{domain}}"
+    ip: "10.0.249.161"
+  sps2:
+    hostname: "sps2"
+    fqdn: "sps2.{{domain}}"
+    ip: "10.0.249.162"
+  sps3:
+    hostname: "sps3"
+    fqdn: "sps3.{{domain}}"
+    ip: "10.0.249.163"
