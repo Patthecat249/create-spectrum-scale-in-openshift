@@ -4,9 +4,9 @@
     - "./vars/vars.yaml"
   tasks:
     - name: "01 - Copy /etc/hosts from control-node to managed-hosts"
-      src: "/etc/hosts"
-      dest: "/etc/hosts"
-      force: "true"
+        src: "/etc/hosts"
+        dest: "/etc/hosts"
+        force: "true"
 
     - name: "02 - Install Epel-Release"
       yum:
