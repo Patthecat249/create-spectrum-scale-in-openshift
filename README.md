@@ -4,13 +4,15 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 
 
 ## How to use
-0. #### Download Spectrum-Scale-Install-File from IBM Fix Central
+1. #### Download Spectrum-Scale-Install-File from IBM Fix Central
 ```bash
 Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
 ```
 
+2. #### Customize variables in "vars/vars.yaml"
+You have to customize all variables you like to in the central vars_file. Especially IP-Adresses, Hostnames, VMware Settings
 
-1. #### Login on terraform-host (VM)
+3. #### Login on terraform-host (VM)
 
    ```bash
    ssh root@terraform.home.local
@@ -24,7 +26,7 @@ Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
 
    
 
-2. #### Erstellen der virtuellen Maschinen mit terraform
+4. #### Erstellen der virtuellen Maschinen mit terraform
 
    ```bash
    cd ~/git/spectrum-scale/ansible/ && ansible-playbook 01-install-spectrum-scale-vms.yaml
@@ -32,14 +34,14 @@ Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
 
    
 
-3. #### Initiale Ansible-Control-Node-Konfiguration
+5. #### Initiale Ansible-Control-Node-Konfiguration
 
    ```bash
    cd ~/git/spectrum-scale/ansible && ./initial-ssh-setup.sh
    ```
    
 
-4. #### Ausführen der Ansible-Playbooks
+6. #### Ausführen der Ansible-Playbooks
 
    Die Playbooks führen die Installation und Konfiguration von Spectrum-Scale durch.
 
@@ -50,7 +52,7 @@ Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
    ```
    
 
-5. #### Login on GUI
+6. #### Login on GUI
 
    ```bash
    https://sps3.home.local
