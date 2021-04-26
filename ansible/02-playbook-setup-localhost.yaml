@@ -3,12 +3,12 @@
   vars_files:
     - "./vars/vars.yaml"
   tasks:
-    - name: "Install sshpass"
-      dnf:
-        name: "sshpass"
-        state: present
-      tags:
-      - ssh
+    # - name: "Install sshpass"
+    #   yum:
+    #     name: "sshpass"
+    #     state: present
+    #   tags:
+    #   - ssh
     - name: "Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
       openssh_keypair:
         path: "/root/.ssh/id_rsa"
