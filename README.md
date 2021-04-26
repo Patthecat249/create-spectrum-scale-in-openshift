@@ -6,6 +6,7 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 ## How to use
 1. #### Download Spectrum-Scale-Install-File from IBM Fix Central
   https://www.ibm.com/support/fixcentral/
+  
   **Product Group:** `System Storage`
 
   **Select from System Storage:** `Storage Software`
