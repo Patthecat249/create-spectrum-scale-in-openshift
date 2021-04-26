@@ -3,30 +3,35 @@
   vars_files:
     - "./vars/vars.yaml"
   tasks:
-    - name: "Install Epel-Release"
+    - name: "01 - Copy /etc/hosts from control-node to managed-hosts"
+      src: "/etc/hosts"
+      dest: "/etc/hosts"
+      force: "true"
+
+    - name: "02 - Install Epel-Release"
       yum:
         name: "epel-release"
         state: present
 
-    - name: "Install sshpass"
+    - name: "03 - Install sshpass"
       yum:
         name: "sshpass"
         state: present
       tags:
       - ssh
-    - name: "Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
+    - name: "04 - Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
       openssh_keypair:
         path: "/root/.ssh/id_rsa"
         size: 4096
         type: "rsa"
       tags:
       - ssh
-    - name: "Copy rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
+    - name: "05 - Copy rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
       copy:
         src: "./rootpassword"
         dest: "/root/rootpassword"
 
-    - name: "Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
+    - name: "06 - Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
       raw: "{{ item }}"
       with_items:
         - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps1.hostname }}"
