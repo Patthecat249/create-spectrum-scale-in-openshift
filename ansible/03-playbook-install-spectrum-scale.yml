@@ -177,7 +177,7 @@
       tags:
         - rpms
 
-    - name: "20 - Add Path to bash_profile"
+    - name: "20 - Add Path /usr/lpp/mmfs/bin to bash_profile"
       lineinfile: 
         path: "/root/.bash_profile"
         regexp: "^PATH="
