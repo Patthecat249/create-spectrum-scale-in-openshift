@@ -18,6 +18,11 @@ vsphere_hardware_version: "13"
 vsphere_hardware_version_non_coreos: "14"
 vsphere_vmtemplate_name: "centos83-template"
 
+network:
+  router: 
+    ip: "10.0.249.1"
+  dns:
+    ip: "10.0.249.53"
 
 domain: "home.local"
 
