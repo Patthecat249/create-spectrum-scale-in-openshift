@@ -181,7 +181,7 @@
       lineinfile: 
         path: "/root/.bash_profile"
         line: "{{ item }}"
-        state: "present"
+        state: "absent"
       with_items:
         - "PATH=$PATH:$HOME/bin:/usr/lpp/mmfs/bin"
       tags:
