@@ -211,6 +211,7 @@
 # Let the deployment begin
     - name: " 24 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "{{entpack_dir}}spectrumscale-install-deploy.sh"
+      remote_src: "true"
       when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
         - retry
