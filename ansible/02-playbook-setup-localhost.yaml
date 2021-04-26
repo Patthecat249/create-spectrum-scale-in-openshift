@@ -4,7 +4,7 @@
     - "./vars/vars.yaml"
   tasks:
     - name: "Install sshpass"
-      yum:
+      dnf:
         name: "sshpass"
         state: present
       tags:
