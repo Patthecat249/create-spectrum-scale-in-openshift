@@ -4,6 +4,11 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 
 
 ## How to use
+0. #### Download Spectrum-Scale-Install-File from IBM Fix Central
+```bash
+Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install
+```
+
 
 1. #### Login on terraform-host (VM)
 
