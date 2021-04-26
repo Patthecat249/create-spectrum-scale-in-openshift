@@ -3,25 +3,31 @@
   vars_files:
     - "./vars/vars.yaml"
   tasks:
-    # - name: "Install sshpass"
+    # - name: "01 - Install sshpass"
     #   yum:
     #     name: "sshpass"
     #     state: present
     #   tags:
     #   - ssh
-    - name: "Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
+    - name: "02 - Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
       openssh_keypair:
         path: "/root/.ssh/id_rsa"
         size: 4096
         type: "rsa"
       tags:
       - ssh
-    - name: "Copy rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
+    
+    - name: "03 - Create main.tf-file"
+      template:
+        src: "inventory.j2"
+        dest: "inventory"
+    
+    - name: "04 - Copy rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
       copy:
         src: "./rootpassword"
         dest: "/root/rootpassword"
 
-    - name: "Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
+    - name: "05 - Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
       raw: "{{ item }}"
       with_items:
         - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps1.hostname }}"
