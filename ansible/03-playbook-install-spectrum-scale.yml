@@ -67,6 +67,7 @@
       copy:
         src: "{{entpack_dir}}{{sps_install_filename}}"
         dest: "{{entpack_dir}}{{sps_install_filename}}"
+        mode: "0755"
 
 
 ########################################################################################
