@@ -182,7 +182,7 @@
         path: "/root/.bash_profile"
         regexp: "^PATH=$PATH"
         line: "PATH=$PATH:$HOME/bin:/usr/lpp/mmfs/bin"
-        state: "present"
+        state: "absent"
       tags:
         - bash
 
