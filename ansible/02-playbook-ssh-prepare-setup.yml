@@ -3,6 +3,11 @@
   vars_files:
     - "./vars/vars.yaml"
   tasks:
+    - name: "Install Epel-Release"
+      yum:
+        name: "epel-release"
+        state: present
+
     - name: "Install sshpass"
       yum:
         name: "sshpass"
