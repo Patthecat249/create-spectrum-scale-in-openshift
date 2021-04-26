@@ -18,6 +18,10 @@ sps:
     fqdn: "{{node3}}.{{domain}}"
     ip: "10.0.249.163"
 
+# Dependencies CentOS8.3
+kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
+kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
+
 # --- VMware Settings --- #
 # VMware-Settings
 vsphere_server: "vcenter.home.local"
