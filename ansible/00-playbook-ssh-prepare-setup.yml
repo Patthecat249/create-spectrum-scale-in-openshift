@@ -1,7 +1,7 @@
 - name: "Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
   hosts: spectrumscale
   vars_files:
-    - "./vars/vars.yaml"
+    - "../vars/vars.yaml"
   tasks:
     - name: "Install sshpass"
       yum:
