@@ -5,8 +5,8 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 
 ## How to use
 1. #### Download Spectrum-Scale-Install-File from IBM Fix Central
-  https://www.ibm.com/support/fixcentral/
-  
+    https://www.ibm.com/support/fixcentral/
+
   **Product Group:** `System Storage`
 
   **Select from System Storage:** `Storage Software`
@@ -43,7 +43,19 @@ You have to customize all variables you like to in the central vars_file. Especi
 
    
 
-4. #### Erstellen der virtuellen Maschinen mit terraform
+4. #### All-In-One-Playbook
+
+   Execute nothing but the "All-In-One-Ansible-Playbook" to install a Spectrum-Scale-Cluster with a single command
+
+   ```bash
+   cd ~/git/spectrum-scale/ansible/ && ansible-playbook 00-all-in-one.yaml
+   ```
+
+
+
+# Alternate Installation
+
+2. #### Create the virtual machines
 
    ```bash
    cd ~/git/spectrum-scale/ansible/ && ansible-playbook 01-install-spectrum-scale-vms.yaml
@@ -51,13 +63,13 @@ You have to customize all variables you like to in the central vars_file. Especi
 
    
 
-5. #### Initiale Ansible-Control-Node-Konfiguration
+3. #### Prepare the Ansible-Control-Node and Ansible-Managed-Nodes with SSH-Keys
 
    ```bash
    cd ~/git/spectrum-scale/ansible && ./initial-ssh-setup.sh
    ```
-   
-6. #### Ausführen der Ansible-Playbooks
+
+4. #### Execute Ansible-Playbooks
 
    Die Playbooks führen die Installation und Konfiguration von Spectrum-Scale durch.
 
@@ -66,8 +78,8 @@ You have to customize all variables you like to in the central vars_file. Especi
    cd ~/git/spectrum-scale/ansible && ansible-playbook 03-playbook-install-spectrum-scale.yml
    cd ~/git/spectrum-scale/ansible && ansible-playbook 04-playbook-create-spectrum-scale-user.yml
    ```
-   
-6. #### Login on GUI
+
+5. #### Login on GUI
 
    ```bash
    https://sps3.home.local
