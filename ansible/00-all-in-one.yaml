@@ -17,10 +17,14 @@
         delay: 10
         timeout: 300
         port: 22
+      tags:
+        - checkfunction
 
 # Execute initial ssh-setup-bash script
     - name: "Execute initial-setup"
       raw: "bash initial-ssh-setup.sh"
+      tags:
+        - checkfunction
 
 # Prepare Ansible-Control-Node
 - import_playbook: "02-playbook-setup-localhost.yaml"
