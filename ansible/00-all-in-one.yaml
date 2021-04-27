@@ -1,0 +1,37 @@
+# Install Spectrum-Scale-Cluster - all-in-one-Playbook
+
+# Install Virtual Machines
+- import_playbook: "01-install-spectrum-scale-vms.yaml"
+
+# Wait for SSH-Login into virtual machines
+- name: "Wait for {{ sps.sps1.hostname }} ({{ sps.sps1.ip }}) to become available"
+  gather_facts: "false"
+  vars_files:
+    - "./vars/vars.yaml"
+  hosts: "127.0.0.1"
+  tasks:
+# Check if Port 22 is open
+    - name: "Check if Port: 22 is open at {{ sps.sps1.ip }} - check every 10 seconds"
+      wait_for:
+        host: "{{ sps.sps1.ip }}"
+        delay: 10
+        timeout: 300
+        port: 22
+
+# Execute initial ssh-setup-bash script
+    - name: "Execute initial-setup"
+      raw: "bash initial-ssh-setup.sh"
+
+# Prepare Ansible-Control-Node
+- import_playbook: "02-playbook-setup-localhost.yaml"
+
+# Enable SSH-Connection on all virtual machines and each other
+- import_playbook: "02-playbook-ssh-prepare-setup.yml"
+
+# Install Spectrum-Scale and configure SPS
+- import_playbook: "03-playbook-install-spectrum-scale.yml"
+
+# Create Users in Spectrum-Scale GUI
+- import_playbook: "04-playbook-create-spectrum-scale-user.yml"
+
+
