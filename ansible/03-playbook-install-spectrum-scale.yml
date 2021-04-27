@@ -237,10 +237,13 @@
         src: "StanzaFile.j2"
         dest: "{{entpack_dir}}StanzaFile"
         mode: "0644"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
+
 
 # Create NSDs for Cluster from Stanza File
     - name: "27 - Create NSDs for the Cluster with mmcrnsd"
       raw: "/usr/lpp/mmfs/bin/mmcrnsd -F {{entpack_dir}}StanzaFile"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Create Filesystem
 
