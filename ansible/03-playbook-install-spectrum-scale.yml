@@ -218,6 +218,7 @@
 # Create the cluster
     - name: "24 - Create the Cluster with mmcrcluster"
       raw: "/usr/lpp/mmfs/bin/mmcrcluster -N {{sps.sps1.fqdn}}:manager-quorum:{{sps.sps1.hostname}},{{sps.sps2.fqdn}}:manager:{{sps.sps2.hostname}},{{sps.sps3.fqdn}}:manager:{{sps.sps3.hostname}} -C {{sps_cluster_name}}"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Assign license to Nodes
     - name: "25 - Assign license with mmchlicense"
@@ -226,8 +227,9 @@
 
 
 # Starten des GPFS-CLusters
-    - name: "26 - Create the Cluster with mmcrcluster"
+    - name: "26 - Start the GPFS-Cluster with mmstartup"
       raw: "/usr/lpp/mmfs/bin/mmstartup -a"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Create NSDs for Cluster
     # - name: "27 - Create NSDs for the Cluster with mmcrnsd"
