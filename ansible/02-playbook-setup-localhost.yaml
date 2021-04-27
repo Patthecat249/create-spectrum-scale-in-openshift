@@ -1,4 +1,4 @@
-- name: "Prepare Ansible-Control-Node"
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Prepare Ansible-Control-Node"
   hosts: 127.0.0.1
   vars_files:
     - "./vars/vars.yaml"

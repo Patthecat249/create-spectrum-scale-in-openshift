@@ -1,4 +1,4 @@
-- name: "Playbook - Create Spectrum-Scale-Users"
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook - Create Spectrum-Scale-Users"
   hosts: "{{ sps_node3 }}"
   gather_facts: false
   vars_files:

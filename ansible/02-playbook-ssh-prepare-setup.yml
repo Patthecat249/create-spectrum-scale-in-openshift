@@ -1,4 +1,4 @@
-- name: "Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
   hosts: spectrumscale
   vars_files:
     - "./vars/vars.yaml"

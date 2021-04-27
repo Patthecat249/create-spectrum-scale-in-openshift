@@ -1,5 +1,5 @@
 ---
-- name: Voraussetzungen fuer Spectrum-Scale installieren
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Install Requirement for Spectrum-Scale"
   hosts: spectrumscale
   vars_files:
     - "./vars/vars.yaml"
