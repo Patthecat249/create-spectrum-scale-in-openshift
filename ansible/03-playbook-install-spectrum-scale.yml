@@ -164,6 +164,8 @@
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.java-5.1.0-3.x86_64.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gpl-5.1.0-3.noarch.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.docs-5.1.0-3.noarch.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.0-3.el8.x86_64.rpm"
+          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.0-3.el8.x86_64.rpm"
           #- "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.protocols-support-5.1.0-3.noarch.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.msg.en_US-5.1.0-3.noarch.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.compression-5.1.0-3.x86_64.rpm"
@@ -175,8 +177,6 @@
     - name: "19 - Install GPFS-RPM-Packages for GUI-Node"
       yum:
         name:
-          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.0-3.el8.x86_64.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.0-3.el8.x86_64.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gui-5.1.0-3.noarch.rpm"
         state: "present"
       when: "'{{ sps_node3 }}' in inventory_hostname"
@@ -192,6 +192,7 @@
         state: "present"
       tags:
         - bash
+
 # Building the GPFS portability layer on Linux nodes using mmbuildgpl 
     - name: "21 - Build the GPFS-Portability-Layer with mmbuildgpl"
       raw: "/usr/lpp/mmfs/bin/mmbuildgpl"
@@ -236,6 +237,11 @@
       raw: "systemctl start gpfsgui"
       when: "'{{ sps_node3 }}' in inventory_hostname"
 
+# Enable the pmcollector and pmsensor
+    - name: "27 - Enable the pmcollectors and pmsensors"
+      raw: "/usr/lpp/mmfs/bin/mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      when: "'{{ sps_node3 }}' in inventory_hostname"
+
 # Create Stanza File from template
     - name: "28 - Create Stanza-File from template"
       template:
@@ -257,14 +263,3 @@
 
 
 
-# # Let the prechecker run
-#     - name: "20 - Install Spectrum-Scale --precheck"
-#       raw: "{{ spectrumscale_cmd }} install --precheck"
-#       when: "'{{ sps_node1 }}' in inventory_hostname"
-
-# # Let the deployment begin
-#     - name: "21 - Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
-#       script: "{{entpack_dir}}spectrumscale-install-deploy.sh"
-#       when: "'{{ sps_node1 }}' in inventory_hostname"
-#       tags:
-#         - retry
