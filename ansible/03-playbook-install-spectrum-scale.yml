@@ -225,14 +225,19 @@
       raw: "/usr/lpp/mmfs/bin/mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
-
+      
 # Starten des GPFS-CLusters
     - name: "26 - Start the GPFS-Cluster with mmstartup"
       raw: "/usr/lpp/mmfs/bin/mmstartup -a"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
+# Starten der GUI
+    - name: "27 - Start the GPFS-GUI"
+      raw: "systemctl start gpfsgui"
+      when: "'{{ sps_node3 }}' in inventory_hostname"
+
 # Create Stanza File from template
-    - name: "27 - Create Stanza-File from template"
+    - name: "28 - Create Stanza-File from template"
       template:
         src: "StanzaFile.j2"
         dest: "{{entpack_dir}}StanzaFile"
@@ -241,7 +246,7 @@
 
 
 # Create NSDs for Cluster from Stanza File
-    - name: "27 - Create NSDs for the Cluster with mmcrnsd"
+    - name: "29 - Create NSDs for the Cluster with mmcrnsd"
       raw: "/usr/lpp/mmfs/bin/mmcrnsd -F {{entpack_dir}}StanzaFile"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 

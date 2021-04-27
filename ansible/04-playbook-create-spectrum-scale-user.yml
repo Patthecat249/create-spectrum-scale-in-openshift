@@ -1,5 +1,5 @@
 - name: "Playbook - Create Spectrum-Scale-Users"
-  hosts: "sps3.home.local"
+  hosts: "{{ sps_node3 }}"
   gather_facts: false
   tasks:
     - name: "Create User on GUI-Node"
