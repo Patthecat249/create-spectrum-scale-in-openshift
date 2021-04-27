@@ -131,28 +131,28 @@
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the Spectrum-Scale-Cluster (make a config-file)
-    - name: "17 - Configure Spectrum-Scale"
-      raw: "{{ item }}"
-      with_items:
-        - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
-        - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
-        - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
-        - "{{ spectrumscale_cmd }} callhome disable"
-        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
-        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
-        - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
-        - "{{ spectrumscale_cmd }} enable smb nfs"
-        - "{{ spectrumscale_cmd }} config protocols -l"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+    # - name: "17 - Configure Spectrum-Scale"
+    #   raw: "{{ item }}"
+    #   with_items:
+    #     - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
+    #     - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
+    #     - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
+    #     - "{{ spectrumscale_cmd }} callhome disable"
+    #     - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
+    #     - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
+    #     - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
+    #     - "{{ spectrumscale_cmd }} enable smb nfs"
+    #     - "{{ spectrumscale_cmd }} config protocols -l"
+    #     - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
+    #     - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
+    #     - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+    #   when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Install GPFS-Packages  
     - name: "18 - Install GPFS-RPM-Packages"
@@ -231,9 +231,16 @@
       raw: "/usr/lpp/mmfs/bin/mmstartup -a"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
-# Create NSDs for Cluster
-    # - name: "27 - Create NSDs for the Cluster with mmcrnsd"
-    #   raw: "mmstartup -a"
+# Create Stanza File from template
+    - name: "27 - Create Stanza-File from template"
+      template:
+        src: "StanzaFile.j2"
+        dest: "{{entpack_dir}}StanzaFile"
+        mode: "0644"
+
+# Create NSDs for Cluster from Stanza File
+    - name: "27 - Create NSDs for the Cluster with mmcrnsd"
+      raw: "/usr/lpp/mmfs/bin/mmcrnsd -F {{entpack_dir}}StanzaFile"
 
 # Create Filesystem
 
