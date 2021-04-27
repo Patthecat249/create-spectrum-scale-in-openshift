@@ -1,2 +1,3 @@
-%nsd: device=/dev/sdb nsd=nsd01 servers=sps-patrick1.home.local usage=dataOnly pool=pool01 thinDiskType=no
-%nsd: device=/dev/sdc nsd=nsd02 servers=sps-patrick1.home.local usage=dataOnly pool=pool02 thinDiskType=no
+%nsd: device=/dev/sdd nsd=nsdshared01 servers={{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}} usage=dataAndMetadata pool=system
+%nsd: device=/dev/sde nsd=nsdshared02 servers={{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}} usage=dataAndMetadata pool=system
+%nsd: device=/dev/sdf nsd=nsdshared03 servers={{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}} usage=dataAndMetadata pool=system

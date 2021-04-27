@@ -164,7 +164,7 @@
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.java-5.1.0-3.x86_64.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gpl-5.1.0-3.noarch.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.docs-5.1.0-3.noarch.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.protocols-support-5.1.0-3.noarch.rpm"
+          #- "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.protocols-support-5.1.0-3.noarch.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.msg.en_US-5.1.0-3.noarch.rpm"
           - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.compression-5.1.0-3.x86_64.rpm"
         state: "present"
