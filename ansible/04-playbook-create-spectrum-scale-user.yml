@@ -1,6 +1,8 @@
 - name: "Playbook - Create Spectrum-Scale-Users"
   hosts: "{{ sps_node3 }}"
   gather_facts: false
+  vars_files:
+    - "./vars/vars.yaml"
   tasks:
     - name: "Create User on GUI-Node"
       raw: "{{ item }}"
