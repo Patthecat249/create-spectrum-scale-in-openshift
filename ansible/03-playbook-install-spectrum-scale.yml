@@ -233,6 +233,12 @@
     - name: "23 - Create NSDs for the Cluster with mmcrnsd"
       raw: "mmstartup -a"
 
+# Create Filesystem
+
+
+# Mount Filesystems
+
+
 
 # # Let the prechecker run
 #     - name: "20 - Install Spectrum-Scale --precheck"
