@@ -9,3 +9,5 @@
       with_items:
         - "/usr/lpp/mmfs/gui/cli/mkuser csiadmin -p Test1234 -g CsiAdmin"
         - "/usr/lpp/mmfs/gui/cli/mkuser patrick -p Test1234 -g SecurityAdmin"
+        - "/usr/lpp/mmfs/gui/cli/mkusergrp ContainerOperator --role containeroperator"
+        - "/usr/lpp/mmfs/gui/cli/mkuser cnss_storage_gui_user -p cnss_storage_gui_password -g ContainerOperator"
