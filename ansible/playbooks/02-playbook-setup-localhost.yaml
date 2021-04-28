@@ -24,8 +24,8 @@
     
     - name: "04 - Copy ../configs/rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
       copy:
-        src: "./../configs/rootpassword"
-        dest: "/root/../configs/rootpassword"
+        src: "../configs/rootpassword"
+        dest: "/root/rootpassword"
 
     - name: "05 - Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
       raw: "{{ item }}"

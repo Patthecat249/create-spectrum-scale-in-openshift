@@ -123,11 +123,11 @@
         - "echo '1' | {{ dir_root }}{{ sps_install_filename }}"
 
 # Execute the sps-setup only on one sps-node
-    - name: "16 - Setup Spectrum-Scale-Installation-Node"
-      raw: "{{ item }}"
-      with_items:
-        - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+    # - name: "16 - Setup Spectrum-Scale-Installation-Node"
+    #   raw: "{{ item }}"
+    #   with_items:
+    #     - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
+    #   when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the Spectrum-Scale-Cluster (make a config-file)
     # - name: "17 - Configure Spectrum-Scale"
@@ -207,6 +207,7 @@
         state: "stopped"
       tags:
         - retry
+
     - name: "23 - Disable rpcbind-socket as prereq from SPS"
       service:
         name: "rpcbind.socket"
@@ -260,9 +261,10 @@
       raw: "/usr/lpp/mmfs/bin/mmcrfs spsopenshift -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T /mnt/spsopenshift -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
-
-
 # Mount Filesystems
+    - name: "31 - Mount Filesystems"
+      raw: "/usr/lpp/mmfs/bin/mmmount -a"
+      when: "'{{ sps_node1 }}' in inventory_hostname"
 
 
 
