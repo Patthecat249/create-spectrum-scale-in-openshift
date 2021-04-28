@@ -402,21 +402,19 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
     sps_dev2: "/dev/sdc"
 # The mount-point, where the filesystems will be mounted
 # The folders will be created by this ansible-script, if they does not exist
-    sps_filesystem1: "/ibm/gpfs/"
-    sps_filesystem2: "/ibm/patrick/"
+    sps_mountpoint_fs1: "/ibm/spsopenshift/"
 # The Spectrum-Scale-Filesystem-Names
 # /dev/sdb > gpfs > /ibm/gpfs/
 # /dev/sdc > patrick > /ibm/patrick/
-    sps_fs1: "gpfs"
-    sps_fs2: "patrick"
+    sps_filesystem_fs1: "spsopenshift"
 # The central used SSH-Keypair based on name
 # private-key: id_rsa
 # public-key: id_rsa.pub
     private_root_key: "/root/.ssh/id_rsa"
 # The central working-directory on the sps-nodes
-    entpack_dir: "/opt/sva/spectrumscale/"
+    dir_root: "/opt/sva/spectrumscale/"
 # Name of the tar-file. this must be downloaded from IBM (passport advantage)
-    entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
+    sps_tar_filename: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
 # The nfs-server and path, where the tar-gz-file is in
     src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
 # Mountpoint on sps-node
@@ -479,7 +477,7 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
 # Checks, if the the working-directory exists
     - name: "Check if folder exists"
       stat:
-        path: "{{ entpack_dir }}"
+        path: "{{ dir_root }}"
       register: folder_details
 
     - name: "DEBUG"
@@ -493,8 +491,8 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
         path: "{{ item }}"
         state: "directory"
       with_items:
-        - "{{ entpack_dir }}"
-        - "{{ sps_filesystem1 }}"
+        - "{{ dir_root }}"
+        - "{{ sps_mountpoint_fs1 }}"
         - "{{ sps_filesystem2 }}"
       when:
         - not folder_details.stat.exists
@@ -502,9 +500,9 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
 # Check, if TAR-Files exists on SPS-Nodes
 # if exist, continue without doing anythin
 # if not, Mount NFS-Share > download > extract file > unmount nfs-share
-    - name: "Check if TAR-File exists on Remote-Machine in Entpack_Directory"
+    - name: "Check if TAR-File exists on Remote-Machine in dir_rootectory"
       stat:
-        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        path: "{{ dir_root }}{{ sps_tar_filename }}"
       register: tar_details
 
     - name: "DEBUG"
@@ -531,8 +529,8 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
 # Copy TAR-File directly from nfs-server to sps-nodes
     - name: "Copy TAR-File from NFS-Server to SPS-Nodes"
       copy:
-        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
-        dest: "{{ entpack_dir }}"
+        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ sps_tar_filename }}"
+        dest: "{{ dir_root }}"
         remote_src: yes
       when:
         - not tar_details.stat.exists
@@ -552,14 +550,14 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
 # Check, if TAR was downloaded correctly and is present on sps-nodes
     - name: "Check if TAR-File exists on Remote-Machine"
       stat:
-        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        path: "{{ dir_root }}{{ sps_tar_filename }}"
       register: tar_after_copy_details
 
 # Extract the TAR-GZ-File in working-drectory
     - name: "Extract Tar-File"
       unarchive:
-        src: "{{ entpack_dir }}{{ entpack_tar_file }}"
-        dest: "{{ entpack_dir }}"
+        src: "{{ dir_root }}{{ sps_tar_filename }}"
+        dest: "{{ dir_root }}"
         remote_src: yes
       when:
         - tar_after_copy_details.stat.exists
@@ -569,22 +567,22 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
     - name: "Copy Kernel Devel from Ansible-Control-Node"
       copy:
         src: "../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
-        dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ dir_root }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
 
     - name: "Copy Kernel Header from Ansible-Control-Node"
       copy:
         src: "../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
-        dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ dir_root }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
 
     - name: "Install Kernel Devel"
       yum:
-        name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        name: "{{ dir_root }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
 
     - name: "Install Kernel Header"
       yum:
-        name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        name: "{{ dir_root }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
 
@@ -626,7 +624,7 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
         - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
         - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
         - "{{ spectrumscale_cmd }} callhome disable"
-        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs1 }} -m {{ sps_filesystem1 }}"
+        - "{{ spectrumscale_cmd }} config protocols -f {{ sps_filesystem_fs1 }} -m {{ sps_mountpoint_fs1 }}"
         - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
         - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
         - "{{ spectrumscale_cmd }} enable smb nfs"
@@ -634,9 +632,9 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
         - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
         - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
         - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
         - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"

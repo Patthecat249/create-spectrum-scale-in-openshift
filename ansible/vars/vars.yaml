@@ -2,8 +2,9 @@
 node1: "sps-patrick1"
 node2: "sps-patrick2"
 node3: "sps-patrick3"
+domain: "home.local"
 
-# --- Spectrum-Scale detailed
+# --- Spectrum-Scale detailed Hostname/IP-Configuration
 sps:
   sps1:
     hostname: "{{node1}}"
@@ -42,17 +43,18 @@ vsphere_hardware_version: "13"
 vsphere_hardware_version_non_coreos: "14"
 vsphere_vmtemplate_name: "template-centos83-16gb"
 
+# Central Network-Settings
 network:
   router: 
-    ip: "10.0.249.1"
+    ip: "10.0.249.1"  # Gateway
   dns:
-    ip: "10.0.249.53"
+    ip: "10.0.249.53" # DNS-Server-IP-Adress
 
-domain: "home.local"
-
+# Spectrum-Scale specific settings
 sps_version: "5.1.0.3"
 spectrumscale_cmd: "/usr/lpp/mmfs/{{sps_version}}/installer/spectrumscale"
 sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"
+sps_tar_filename: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
 sps_cluster_name: "sps.home.local"
 sps_setup_node_ip: "10.0.249.161"
 sps_ntp_ip1: "10.0.249.1"
@@ -60,19 +62,19 @@ sps_ces_export_ip1: "10.0.249.164"
 sps_node1: "{{sps.sps1.fqdn}}"
 sps_node2: "{{sps.sps2.fqdn}}"
 sps_node3: "{{sps.sps3.fqdn}}"
-
 sps_dev1: "/dev/sdb"
 sps_dev2: "/dev/sdc"
-sps_filesystem1: "/mnt/gpfs/"
-sps_filesystem2: "/mnt/patrick/"
-sps_fs1: "gpfs"
-sps_fs2: "patrick"
+sps_mountpoint_fs1: "/mnt/spsopenshift/"
+sps_filesystem_fs1: "spsopenshift"
 
+# Working-Directories
 dir_spectrumscalenodes: "/opt/sva/terraform/spectrumscale-nodes/"
+dir_root: "/opt/sva/spectrumscale/"
 
+# SSH-Settings
 private_root_key: "/root/.ssh/id_rsa"
-entpack_dir: "/opt/sva/spectrumscale/"
-entpack_tar_file: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
+
+# NFS-Settings
 src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
 dest_nas_mount_path: "/mnt/spectrumscale"
 

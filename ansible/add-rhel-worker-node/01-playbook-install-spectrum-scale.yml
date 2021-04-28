@@ -1,28 +1,9 @@
 ---
-- name: Voraussetzungen fuer Spectrum-Scale installieren
+- name: "Install Requirements for Spectrum-Scale"
   hosts: spectrumscale
   gather_facts: false
-  vars:
-    spectrumscale_cmd: "/usr/lpp/mmfs/5.0.5.0/installer/spectrumscale"
-    sps_install_filename: "Spectrum_Scale_Standard-5.0.5.0-x86_64-Linux-install"
-    sps_cluster_name: "sps.home.local"
-    sps_setup_node_ip: "10.0.249.241"
-    sps_ntp_ip1: "10.0.249.1"
-    sps_ces_export_ip1: "10.0.249.245"
-    sps_node1: "sps1.home.local"
-    sps_node2: "sps2.home.local"
-    sps_node3: "sps3.home.local"
-    sps_dev1: "/dev/sdb"
-    sps_dev2: "/dev/sdc"
-    sps_filesystem1: "/ibm/gpfs/"
-    sps_filesystem2: "/ibm/patrick/"
-    sps_fs1: "gpfs"
-    sps_fs2: "patrick"
-    private_root_key: "/root/.ssh/id_rsa"
-    entpack_dir: "/opt/sva/spectrumscale/"
-    entpack_tar_file: "Scale_std_install-5.0.5.0_x86_64.tar.gz"
-    src_nas_mount: "nas.home.local:/volume1/nfs-iso/"
-    dest_nas_mount_path: "/mnt"
+  vars_files:
+    - "./vars/vars.yaml"
   tasks:
 #    - name: "Add EPEL-Release-Repo"
 #      yum:
@@ -58,7 +39,7 @@
         state: present
     - name: "Check if folder exists"
       stat:
-        path: "{{ entpack_dir }}"
+        path: "{{ dir_root }}"
       register: folder_details
     - name: "DEBUG"
       debug:
@@ -69,14 +50,13 @@
         path: "{{ item }}"
         state: "directory"
       with_items:
-        - "{{ entpack_dir }}"
-        - "{{ sps_filesystem1 }}"
-        - "{{ sps_filesystem2 }}"
+        - "{{ dir_root }}"
+        - "{{ sps_mountpoint_fs1 }}"
       when:
         - not folder_details.stat.exists
-    - name: "Check if TAR-File exists on Remote-Machine in Entpack_Directory"
+    - name: "Check if TAR-File exists on Remote-Machine in dir_rootectory"
       stat:
-        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        path: "{{ dir_root }}{{ sps_tar_filename }}"
       register: tar_details
     - name: "DEBUG"
       debug:
@@ -96,8 +76,8 @@
         timeout: 1
     - name: "Copy TAR-File from NFS-Server to SPS-Nodes"
       copy:
-        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ entpack_tar_file }}"
-        dest: "{{ entpack_dir }}"
+        src: "{{ dest_nas_mount_path }}/spectrumscale/{{ sps_tar_filename }}"
+        dest: "{{ dir_root }}"
         remote_src: yes
       when:
         - not tar_details.stat.exists
@@ -113,31 +93,31 @@
         - not tar_details.stat.exists
     - name: "Check if TAR-File exists on Remote-Machine"
       stat:
-        path: "{{ entpack_dir }}{{ entpack_tar_file }}"
+        path: "{{ dir_root }}{{ sps_tar_filename }}"
       register: tar_after_copy_details
     - name: "Extract Tar-File"
       unarchive:
-        src: "{{ entpack_dir }}{{ entpack_tar_file }}"
-        dest: "{{ entpack_dir }}"
+        src: "{{ dir_root }}{{ sps_tar_filename }}"
+        dest: "{{ dir_root }}"
         remote_src: yes
       when:
         - tar_after_copy_details.stat.exists
     - name: "Copy Kernel Devel from Ansible-Control-Node"
       copy:
         src: "../../dependencies/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
-        dest: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ dir_root }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
     - name: "Copy Kernel Header from Ansible-Control-Node"
       copy:
         src: "../../dependencies/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
-        dest: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        dest: "{{ dir_root }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
     - name: "Install Kernel Devel"
       yum:
-        name: "{{ entpack_dir }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
+        name: "{{ dir_root }}/kernel-devel-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
     - name: "Install Kernel Header"
       yum:
-        name: "{{ entpack_dir }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
+        name: "{{ dir_root }}/kernel-headers-3.10.0-1062.el7.x86_64.rpm"
         allow_downgrade: yes
         state: present
 #    - name: "Remove EPEL-Release-Repo"
