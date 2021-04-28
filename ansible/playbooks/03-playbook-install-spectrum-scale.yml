@@ -225,22 +225,10 @@
     - name: "25 - Assign license with mmchlicense"
       raw: "/usr/lpp/mmfs/bin/mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-
       
 # Starten des GPFS-CLusters
-    - name: "26 - Start the GPFS-Cluster with mmstartup"
-      raw: "/usr/lpp/mmfs/bin/mmstartup -a"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
-
-# Starten der GUI
-    - name: "27 - Start the GPFS-GUI"
-      raw: "systemctl start gpfsgui"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
-
-# Enable the pmcollector and pmsensor
-    - name: "27 - Enable the pmcollectors and pmsensors"
-      raw: "/usr/lpp/mmfs/bin/mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
+    - name: "26 - Start the GPFS-Cluster on all nodes with mmstartup"
+      raw: "/usr/lpp/mmfs/bin/mmstartup"
 
 # Create Stanza File from template
     - name: "28 - Create Stanza-File from template"
@@ -249,7 +237,6 @@
         dest: "{{dir_root}}StanzaFile"
         mode: "0644"
       when: "'{{ sps_node1 }}' in inventory_hostname"
-
 
 # Create NSDs for Cluster from Stanza File
     - name: "29 - Create NSDs for the Cluster with mmcrnsd"
@@ -265,8 +252,17 @@
 
 # Mount Filesystems
     - name: "31 - Mount Filesystems"
-      raw: "/usr/lpp/mmfs/bin/mmmount -a"
+      raw: "/usr/lpp/mmfs/bin/mmmount all -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
+# Starten der GUI
+    - name: "27 - Start the GPFS-GUI on {{ sps_node3 }}"
+      raw: "systemctl start gpfsgui"
+      when: "'{{ sps_node3 }}' in inventory_hostname"
+
+# Enable the pmcollector and pmsensor
+    - name: "27 - Enable the pmcollectors and pmsensors"
+      raw: "/usr/lpp/mmfs/bin/mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      when: "'{{ sps_node3 }}' in inventory_hostname"
 
 
