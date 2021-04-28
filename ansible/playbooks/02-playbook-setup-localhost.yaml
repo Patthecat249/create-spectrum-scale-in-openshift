@@ -1,7 +1,7 @@
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Prepare Ansible-Control-Node"
   hosts: 127.0.0.1
   vars_files:
-    - "./vars/vars.yaml"
+    - "../vars/vars.yaml"
   tasks:
     # - name: "01 - Install sshpass"
     #   yum:

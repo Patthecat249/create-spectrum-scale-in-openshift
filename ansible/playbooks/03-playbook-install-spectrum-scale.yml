@@ -2,7 +2,7 @@
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Install Requirement for Spectrum-Scale"
   hosts: spectrumscale
   vars_files:
-    - "./vars/vars.yaml"
+    - "../vars/vars.yaml"
   gather_facts: false
   tasks:
     - name: "01 - Add EPEL-Release-Repo"
