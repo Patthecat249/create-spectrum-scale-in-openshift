@@ -1,0 +1,46 @@
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
+  hosts: spectrumscale
+  vars_files:
+    - "./vars/vars.yaml"
+  tasks:
+    - name: "01 - Copy /etc/hosts from control-node to managed-hosts"
+      copy:
+        src: "/etc/hosts"
+        dest: "/etc/hosts"
+        force: "true"
+
+    - name: "02 - Install Epel-Release"
+      yum:
+        name: "epel-release"
+        state: present
+
+    - name: "03 - Install sshpass"
+      yum:
+        name: "sshpass"
+        state: present
+      tags:
+      - ssh
+    - name: "04 - Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
+      openssh_keypair:
+        path: "/root/.ssh/id_rsa"
+        size: 4096
+        type: "rsa"
+      tags:
+      - ssh
+    - name: "05 - Copy ../configs/rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
+      copy:
+        src: "./../configs/rootpassword"
+        dest: "/root/../configs/rootpassword"
+
+    - name: "06 - Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
+      raw: "{{ item }}"
+      with_items:
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps1.hostname }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps1.fqdn }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps1.ip }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps2.hostname }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps2.fqdn }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps2.ip }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps3.hostname }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps3.fqdn }}"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@{{ sps.sps3.ip }}"

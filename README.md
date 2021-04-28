@@ -66,7 +66,7 @@ You have to customize all variables you like to in the central vars_file. Especi
 3. #### Prepare the Ansible-Control-Node and Ansible-Managed-Nodes with SSH-Keys
 
    ```bash
-   cd ~/git/spectrum-scale/ansible && ./initial-ssh-setup.sh
+   cd ~/git/spectrum-scale/ansible && ./../configs/initial-ssh-setup.sh
    ```
 
 4. #### Execute Ansible-Playbooks

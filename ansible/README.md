@@ -12,7 +12,7 @@
 - [Installation-Process-Description](#Installation-Process-Description)
   * [Ansible-Control-Node preparation](#Ansible-Control-Node-preparation)
     + [Download and Install helper-tool sshpass](#Download-and-Install-helper-tool-sshpass)
-    + [initial-ssh-setup.sh](#initial-ssh-setup.sh)
+    + [../configs/initial-ssh-setup.sh](#../configs/initial-ssh-setup.sh)
   * [Ansible-Playbook-Documentation](#Ansible-Playbook-Documentation)
     + [00-playbook-ssh-prepare-setup.yml](#00-playbook-ssh-prepare-setup.yml)
     + [01-playbook-install-spectrum-scale.yml](#01-playbook-install-spectrum-scale.yml)
@@ -283,7 +283,7 @@ git clone https://github.com/Patthecat249/spectrum-scale.git
 cd git/spectrum-scale/ansible/
 
 # execute the initial-setup-script
-./initial-ssh-setup.sh
+./../configs/initial-ssh-setup.sh
 # execute the playbook one after another
 ansible-playbook 00-playbook-ssh-prepare-setup.yml
 ansible-playbook 01-playbook-install-spectrum-scale.yml
@@ -295,30 +295,30 @@ ansible-playbook 02-playbook-create-spectrum-scale-user.yml
 
 ## Ansible-Control-Node preparation
 
-The first thing you have to do, is to execute the ***"initial-ssh-setup.sh"***-script. It creates an SSH-Keypair (***ssh-keygen***) on your Ansible-Control-Node and deploys (***ssh-copy-id***) the SSH-Public-Key to the Managed-Spectrum-Nodes.
+The first thing you have to do, is to execute the ***"../configs/initial-ssh-setup.sh"***-script. It creates an SSH-Keypair (***ssh-keygen***) on your Ansible-Control-Node and deploys (***ssh-copy-id***) the SSH-Public-Key to the Managed-Spectrum-Nodes.
 
 ### Download and Install helper-tool sshpass
 
 You may have to download and install the helper-tool ***sshpass*** to the Ansible-Control-Node.
 
-### initial-ssh-setup.sh
+### ../configs/initial-ssh-setup.sh
 
 ```bash
 #!/usr/bin/bash
 # Setup for SPS-Node#1
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.241
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.241
 
 # Setup for SPS-Node#2
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2.home.local
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.242
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2.home.local
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.242
 
 # Setup for SPS-Node#3
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3.home.local
-sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.243
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3.home.local
+sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.243
 ```
 
 
@@ -357,15 +357,15 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
     - name: "Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
       raw: "{{ item }}"
       with_items:
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.241"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2.home.local"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.242"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3.home.local"
-        - "sshpass -f rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.243"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps1.home.local"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.241"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps2.home.local"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.242"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@sps3.home.local"
+        - "sshpass -f ../configs/rootpassword ssh-copy-id -i /root/.ssh/id_rsa -o StrictHostKeyChecking=no root@10.0.249.243"
 ```
 
 

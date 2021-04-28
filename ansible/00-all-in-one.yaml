@@ -1,7 +1,7 @@
 # Install Spectrum-Scale-Cluster - all-in-one-Playbook
 
 # Install Virtual Machines
-- import_playbook: "01-install-spectrum-scale-vms.yaml"
+- import_playbook: "playbooks/01-install-spectrum-scale-vms.yaml"
 
 # Wait for SSH-Login into virtual machines
 - name: "Wait for {{ sps.sps1.hostname }} ({{ sps.sps1.ip }}) to become available"
@@ -22,20 +22,20 @@
 
 # Execute initial ssh-setup-bash script
     - name: "Execute initial-setup"
-      raw: "bash initial-ssh-setup.sh"
+      raw: "bash ../configs/initial-ssh-setup.sh"
       tags:
         - checkfunction
 
 # Prepare Ansible-Control-Node
-- import_playbook: "02-playbook-setup-localhost.yaml"
+- import_playbook: "playbooks/02-playbook-setup-localhost.yaml"
 
 # Enable SSH-Connection on all virtual machines and each other
-- import_playbook: "02-playbook-ssh-prepare-setup.yml"
+- import_playbook: "playbooks/02-playbook-ssh-prepare-setup.yml"
 
 # Install Spectrum-Scale and configure SPS
-- import_playbook: "03-playbook-install-spectrum-scale.yml"
+- import_playbook: "playbooks/03-playbook-install-spectrum-scale.yml"
 
 # Create Users in Spectrum-Scale GUI
-- import_playbook: "04-playbook-create-spectrum-scale-user.yml"
+- import_playbook: "playbooks/04-playbook-create-spectrum-scale-user.yml"
 
 
