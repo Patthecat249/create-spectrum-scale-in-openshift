@@ -7,7 +7,7 @@
 - name: "Wait for {{ sps.sps1.hostname }} ({{ sps.sps1.ip }}) to become available"
   gather_facts: "false"
   vars_files:
-    - "./vars/vars.yaml"
+    - "vars/vars.yaml"
   hosts: "127.0.0.1"
   tasks:
 # Check if Port 22 is open
@@ -22,7 +22,7 @@
 
 # Execute initial ssh-setup-bash script
     - name: "Execute initial-setup"
-      raw: "bash ../configs/initial-ssh-setup.sh"
+      raw: "bash configs/initial-ssh-setup.sh"
       tags:
         - checkfunction
 
@@ -37,5 +37,3 @@
 
 # Create Users in Spectrum-Scale GUI
 - import_playbook: "playbooks/04-playbook-create-spectrum-scale-user.yml"
-
-
