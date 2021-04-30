@@ -51,7 +51,7 @@ network:
     ip: "10.0.249.53" # DNS-Server-IP-Adress
 
 # Spectrum-Scale specific settings
-sps_version: "5.1.0.3"
+sps_version: "5.1.1.0"
 spectrumscale_cmd: "/usr/lpp/mmfs/{{sps_version}}/installer/spectrumscale"
 sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"
 sps_tar_filename: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
