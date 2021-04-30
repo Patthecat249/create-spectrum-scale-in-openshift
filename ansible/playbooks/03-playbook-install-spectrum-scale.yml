@@ -157,17 +157,17 @@
     - name: "18 - Install GPFS-RPM-Packages"
       yum:
         name:
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.base-5.1.0-3.x86_64.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gskit-8.0.55-12.x86_64.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.license.std-5.1.0-3.x86_64.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.java-5.1.0-3.x86_64.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gpl-5.1.0-3.noarch.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.docs-5.1.0-3.noarch.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.0-3.el8.x86_64.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.0-3.el8.x86_64.rpm"
-          #- "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.protocols-support-5.1.0-3.noarch.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.msg.en_US-5.1.0-3.noarch.rpm"
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.compression-5.1.0-3.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-0.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-12.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-0.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-0.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-0.noarch.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.docs-5.1.1-0.noarch.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.1-0.el8.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.1-0.el8.x86_64.rpm"
+          #- "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.protocols-support-5.1.1-0.noarch.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.msg.en_US-5.1.1-0.noarch.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.compression-5.1.1-0.x86_64.rpm"
         state: "present"
       tags:
         - rpms
@@ -176,7 +176,7 @@
     - name: "19 - Install GPFS-RPM-Packages for GUI-Node"
       yum:
         name:
-          - "/usr/lpp/mmfs/5.1.0.3/gpfs_rpms/gpfs.gui-5.1.0-3.noarch.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gui-5.1.1-0.noarch.rpm"
         state: "present"
       when: "'{{ sps_node3 }}' in inventory_hostname"
       tags:
