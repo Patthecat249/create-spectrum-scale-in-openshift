@@ -158,7 +158,7 @@
       yum:
         name:
           - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-0.x86_64.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-12.x86_64.rpm"
+          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.x86_64.rpm"
           - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-0.x86_64.rpm"
           - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-0.x86_64.rpm"
           - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-0.noarch.rpm"
