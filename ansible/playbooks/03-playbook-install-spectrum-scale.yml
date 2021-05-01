@@ -122,52 +122,20 @@
       with_items:
         - "echo '1' | {{ dir_root }}{{ sps_install_filename }}"
 
-# Execute the sps-setup only on one sps-node
-    # - name: "16 - Setup Spectrum-Scale-Installation-Node"
-    #   raw: "{{ item }}"
-    #   with_items:
-    #     - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
-    #   when: "'{{ sps_node1 }}' in inventory_hostname"
-
-# Configure the Spectrum-Scale-Cluster (make a config-file)
-    # - name: "17 - Configure Spectrum-Scale"
-    #   raw: "{{ item }}"
-    #   with_items:
-    #     - "{{ spectrumscale_cmd }} config gpfs -c {{ sps_cluster_name }}"
-    #     - "{{ spectrumscale_cmd }} config ntp -e on -s {{ sps_ntp_ip1 }}"
-    #     - "{{ spectrumscale_cmd }} config gpfs -e 60000-61000"
-    #     - "{{ spectrumscale_cmd }} callhome disable"
-    #     - "{{ spectrumscale_cmd }} config protocols -f {{ sps_filesystem_fs1 }} -m {{ sps_mountpoint_fs1 }}"
-    #     - "{{ spectrumscale_cmd }} config protocols -f {{ sps_fs2 }} -m {{ sps_filesystem2 }}"
-    #     - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
-    #     - "{{ spectrumscale_cmd }} enable smb nfs"
-    #     - "{{ spectrumscale_cmd }} config protocols -l"
-    #     - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
-    #     - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
-    #     - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
-    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
-    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
-    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
-    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-    #     - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-    #   when: "'{{ sps_node1 }}' in inventory_hostname"
-
 # Install GPFS-Packages  
     - name: "18 - Install GPFS-RPM-Packages"
       yum:
         name:
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-0.x86_64.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.x86_64.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-0.x86_64.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-0.x86_64.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-0.noarch.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.docs-5.1.1-0.noarch.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.1-0.el8.x86_64.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.1-0.el8.x86_64.rpm"
-          #- "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.protocols-support-5.1.1-0.noarch.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.msg.en_US-5.1.1-0.noarch.rpm"
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.compression-5.1.1-0.x86_64.rpm"
+          - "{{gpfs_base}}"
+          - "{{gpfs_gskit}}"
+          - "{{gpfs_license}}"
+          - "{{gpfs_java}}"
+          - "{{gpfs_gpl}}"
+          - "{{gpfs_docs}}"
+          - "{{gpfs_pmsensors}}"
+          - "{{gpfs_pmcollector}}"
+          - "{{gpfs_msg}}"
+          - "{{gpfs_compression}}"
         state: "present"
       tags:
         - rpms
@@ -176,25 +144,25 @@
     - name: "19 - Install GPFS-RPM-Packages for GUI-Node"
       yum:
         name:
-          - "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gui-5.1.1-0.noarch.rpm"
+          - "{{gpfs_gui}}"
         state: "present"
       when: "'{{ sps_node3 }}' in inventory_hostname"
       tags:
         - rpms
 
 # Add PATH to bash_profile to execute GPFS-Commands from everywhere
-    - name: "20 - Add Path /usr/lpp/mmfs/bin to bash_profile"
+    - name: "20 - Add Path {{gpfs_binary_path}} to bash_profile"
       lineinfile: 
         path: "/root/.bash_profile"
         regexp: "^PATH="
-        line: "PATH=$PATH:$HOME/bin:/usr/lpp/mmfs/bin"
+        line: "PATH=$PATH:$HOME/bin:{{gpfs_binary_path}}"
         state: "present"
       tags:
         - bash
 
 # Building the GPFS portability layer on Linux nodes using mmbuildgpl 
     - name: "21 - Build the GPFS-Portability-Layer with mmbuildgpl"
-      raw: "/usr/lpp/mmfs/bin/mmbuildgpl"
+      raw: "{{gpfs_binary_path}}mmbuildgpl"
       tags:
         - gpl
 
@@ -218,17 +186,17 @@
 
 # Create the cluster
     - name: "24 - Create the Cluster with mmcrcluster"
-      raw: "/usr/lpp/mmfs/bin/mmcrcluster -N {{sps.sps1.fqdn}}:manager-quorum:{{sps.sps1.hostname}},{{sps.sps2.fqdn}}:manager:{{sps.sps2.hostname}},{{sps.sps3.fqdn}}:manager:{{sps.sps3.hostname}} -C {{sps_cluster_name}}"
+      raw: "{{gpfs_binary_path}}mmcrcluster -N {{sps.sps1.fqdn}}:manager-quorum:{{sps.sps1.hostname}},{{sps.sps2.fqdn}}:manager:{{sps.sps2.hostname}},{{sps.sps3.fqdn}}:manager:{{sps.sps3.hostname}} -C {{sps_cluster_name}}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Assign license to Nodes
     - name: "25 - Assign license with mmchlicense"
-      raw: "/usr/lpp/mmfs/bin/mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      raw: "{{gpfs_binary_path}}mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
       
 # Starten des GPFS-CLusters
     - name: "26 - Start the GPFS-Cluster on all nodes with mmstartup"
-      raw: "/usr/lpp/mmfs/bin/mmstartup"
+      raw: "{{gpfs_binary_path}}mmstartup"
 
 # Create Stanza File from template
     - name: "27 - Create Stanza-File from template"
@@ -240,19 +208,19 @@
 
 # Create NSDs for Cluster from Stanza File
     - name: "28 - Create NSDs for the Cluster with mmcrnsd"
-      raw: "/usr/lpp/mmfs/bin/mmcrnsd -F {{dir_root}}StanzaFile"
+      raw: "{{gpfs_binary_path}}mmcrnsd -F {{dir_root}}StanzaFile"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Create Filesystem
     - name: "29 - Create Filesystem for the Cluster with mmcrnsd"
-      raw: "/usr/lpp/mmfs/bin/mmcrfs spsopenshift -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T /mnt/spsopenshift -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
+      raw: "{{gpfs_binary_path}}mmcrfs spsopenshift -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T /mnt/spsopenshift -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
       when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
         - createfs
 
 # Mount Filesystems
     - name: "30 - Mount Filesystems"
-      raw: "/usr/lpp/mmfs/bin/mmmount all -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      raw: "{{gpfs_binary_path}}mmmount all -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Starten der GUI
@@ -262,7 +230,7 @@
 
 # Enable the pmcollector and pmsensor
     - name: "32 - Enable the pmcollectors and pmsensors"
-      raw: "/usr/lpp/mmfs/bin/mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       when: "'{{ sps_node3 }}' in inventory_hostname"
 
 
