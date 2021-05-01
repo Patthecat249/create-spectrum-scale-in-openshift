@@ -213,7 +213,7 @@
 
 # Create Filesystem
     - name: "29 - Create Filesystem for the Cluster with mmcrnsd"
-      raw: "{{gpfs_binary_path}}mmcrfs spsopenshift -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T /mnt/spsopenshift -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
+      raw: "{{gpfs_binary_path}}mmcrfs {{sps_filesystem_fs1}} -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T {{sps_mountpoint_fs1}} -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
       when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
         - createfs
