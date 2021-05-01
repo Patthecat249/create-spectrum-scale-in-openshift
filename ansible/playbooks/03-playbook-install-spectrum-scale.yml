@@ -247,7 +247,8 @@
 # Initialize the performance collection 
     - name: "33 - Initialize the performance collection"
       raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
+      #when: "'{{ sps_node3 }}' in inventory_hostname"
+      delegate_to: "sps-patrick3.home.local"
 
 
 
