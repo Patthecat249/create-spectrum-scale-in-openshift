@@ -25,6 +25,9 @@ url_kernel_header: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/
 kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
 kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
 
+# GPFS-Binary-Path
+gpfs_binary_path: "/usr/lpp/mmfs/bin/"
+
 # Variables for Install GPFS-RPM-Packages
 gpfs_base: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-0.x86_64.rpm"
 gpfs_gskit: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.x86_64.rpm"
