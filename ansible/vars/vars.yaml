@@ -20,8 +20,11 @@ sps:
     ip: "10.0.249.163"
 
 # Dependencies CentOS8.3
+url_kernel_devel: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_devel}}"
+url_kernel_header: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_header}}"
 kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
 kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
+
 
 # --- VMware Settings --- #
 # VMware-Settings
@@ -51,6 +54,11 @@ network:
     ip: "10.0.249.53" # DNS-Server-IP-Adress
 
 # Spectrum-Scale specific settings
+# Spectrum-Scale-Container-Native-Storage-Access (CNSA)
+user_cnsa_storage_gui: "cnsa"
+grp_containeroperator: "ContainerOperator" # Case-sensitive
+role_containeroperator: "containeroperator" # Case-sensitive
+
 sps_version: "5.1.1.0"
 spectrumscale_cmd: "/usr/lpp/mmfs/{{sps_version}}/installer/spectrumscale"
 sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"

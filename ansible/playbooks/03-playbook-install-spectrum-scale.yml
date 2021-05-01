@@ -82,13 +82,13 @@
 
     - name: "09 - Download Kernel-Devel"
       get_url:
-        url: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_devel}}"
+        url: "{{url_kernel_devel}}"
         dest: "{{ dir_root }}/{{kernel_devel}}"
 
 
     - name: "10 - Download Kernel-Header"
       get_url:
-        url: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/kernel-headers-4.18.0-240.el8.x86_64.rpm"
+        url: "{{url_kernel_header}}"
         dest: "{{ dir_root }}/{{kernel_header}}"
 
 
