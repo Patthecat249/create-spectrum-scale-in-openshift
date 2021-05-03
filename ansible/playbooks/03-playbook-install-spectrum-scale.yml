@@ -1,11 +1,13 @@
 ---
+# RUNs on all SPS-NODES
+#
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Install Requirement for Spectrum-Scale"
   hosts: spectrumscale
   vars_files:
     - "../vars/vars.yaml"
   gather_facts: false
   tasks:
-    - name: "01 - Add EPEL-Release-Repo"
+    - name: "01 - Add EPEL-Release-Repo on CentOS"
       yum:
         name: epel-release.noarch
         state: present
@@ -27,25 +29,12 @@
           - elfutils-devel.x86_64
         state: "present"
 
-    - name: "03 - Create Shell-Script"
-      template:
-        src: "../configs/spectrumscale-install-deploy.sh.j2"
-        dest: "{{dir_root}}spectrumscale-install-deploy.sh"
-        mode: "0755"
-      delegate_to: 127.0.0.1
-      tags:
-        - retry
-
-    - name: "04 - Check if folder {{ dir_root }} exists"
+    - name: "03 - Check if folder {{ dir_root }} exists"
       stat:
         path: "{{ dir_root }}"
       register: folder_details
 
-    # - name: "04 - DEBUG"
-    #   debug:
-    #     msg: "{{ folder_details }}"
-
-    - name: "05 - Create Directoy {{ dir_root }}"
+    - name: "04 - Create Directoy {{ dir_root }}"
       file:
         recurse: "true"
         path: "{{ item }}"
@@ -56,7 +45,7 @@
       when:
         - not folder_details.stat.exists
     
-    - name: "06 - Spectrum-Scale-Mount-Verzeichnis erstellen"
+    - name: "05 - Create Spectrum-Scale-Mountpoint-Directory"
       file:
         recurse: "true"
         path: "{{ item }}"
@@ -64,66 +53,66 @@
       with_items:
         - "{{ dest_nas_mount_path }}"
 
-    - name: "07 - Check if {{ dir_root }}{{ sps_install_filename }} exists on Remote-Machine in dir_rootectory"
+    - name: "06 - Check if {{ dir_root }}{{ sps_install_filename }} exists on Remote-Machine in dir_rootectory"
       stat:
         path: "{{ dir_root }}{{ sps_install_filename }}"
       register: tar_details
 
-    # - name: "07 - DEBUG"
+    # - name: "DEBUG"
     #   debug:
     #     msg: "{{ tar_details }}"
 
 # Copy sps_install_filename from control-node to managed-nodes
-    - name: "08 - Copy {{sps_install_filename}} from control-node to managed-hosts"
+    - name: "07 - Copy {{sps_install_filename}} from control-node to managed-hosts"
       copy:
         src: "{{dir_root}}{{sps_install_filename}}"
         dest: "{{dir_root}}{{sps_install_filename}}"
         mode: "0755"
 
-    - name: "09 - Download Kernel-Devel"
+    - name: "08 - Download Kernel-Devel"
       get_url:
         url: "{{url_kernel_devel}}"
         dest: "{{ dir_root }}/{{kernel_devel}}"
 
 
-    - name: "10 - Download Kernel-Header"
+    - name: "09 - Download Kernel-Header"
       get_url:
         url: "{{url_kernel_header}}"
         dest: "{{ dir_root }}/{{kernel_header}}"
 
 
-    - name: "11 - Install Kernel Devel"
+    - name: "10 - Install Kernel Devel"
       yum:
         name: "{{ dir_root }}/{{kernel_devel}}"
         allow_downgrade: yes
         state: present
-    - name: "12 - Install Kernel Header"
+    - name: "11 - Install Kernel Header"
       yum:
         name: "{{ dir_root }}/{{kernel_header}}"
         allow_downgrade: yes
         state: present
 
 # the epel-release must be removed for sps-prerequisites
-    - name: "13 - Remove EPEL-Release-Repo"
+    - name: "12 - Remove EPEL-Release-Repo"
       yum:
         name: "epel-release.noarch"
         state: "absent"
 
 # Disable firewall for easier setup
-    - name: "14 - Stop and disable firewalld"
+    - name: "13 - Stop and disable firewalld"
       service:
         name: firewalld
         state: stopped
         enabled: "false"
 
 # Execute the install-file to install the sps-dependencies
-    - name: "15 - Execute SpectrumScale Install-File to extract gpfs-binaries, rpm-files, etc."
+    - name: "14 - Execute SpectrumScale Install-File to extract gpfs-binaries, rpm-files, etc."
       raw: "{{ item }}"
       with_items:
         - "echo '1' | {{ dir_root }}{{ sps_install_filename }}"
 
 # Install GPFS-Packages  
-    - name: "18 - Install GPFS-RPM-Packages"
+    - name: "15 - Install GPFS-RPM-Packages"
       yum:
         name:
           - "{{gpfs_base}}"
@@ -140,18 +129,9 @@
       tags:
         - rpms
 
-# Install GUI-Packages
-    - name: "19 - Install GPFS-RPM-Packages for GUI-Node"
-      yum:
-        name:
-          - "{{gpfs_gui}}"
-        state: "present"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
-      tags:
-        - rpms
 
 # Add PATH to bash_profile to execute GPFS-Commands from everywhere
-    - name: "20 - Add Path {{gpfs_binary_path}} to bash_profile"
+    - name: "16 - Add Path {{gpfs_binary_path}} to bash_profile"
       lineinfile: 
         path: "/root/.bash_profile"
         regexp: "^PATH="
@@ -161,14 +141,13 @@
         - bash
 
 # Building the GPFS portability layer on Linux nodes using mmbuildgpl 
-    - name: "21 - Build the GPFS-Portability-Layer with mmbuildgpl"
+    - name: "17 - Build the GPFS-Portability-Layer with mmbuildgpl"
       raw: "{{gpfs_binary_path}}mmbuildgpl"
       tags:
         - gpl
 
-
 # Disable the rpcbind-service and socket
-    - name: "22 - Disable rpcbind-service as prereq from SPS"
+    - name: "18 - Disable rpcbind-service as prereq from SPS"
       service:
         name: "rpcbind"
         enabled: "false"
@@ -176,7 +155,7 @@
       tags:
         - retry
 
-    - name: "23 - Disable rpcbind-socket as prereq from SPS"
+    - name: "19 - Disable rpcbind-socket as prereq from SPS"
       service:
         name: "rpcbind.socket"
         enabled: "false"
@@ -184,15 +163,64 @@
       tags:
         - retry
 
+
+
+# Execute only on Spectrum-Scale-GUI-Node
+#
+# ONLY on GUI-NODE
+#
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure Spectrum-Scale GUI-Node"
+  hosts: "{{ sps_node3 }}"
+  vars_files:
+    - "../vars/vars.yaml"
+  gather_facts: false
+  tasks:
+# Install GUI-Packages
+    - name: "20 - Install GPFS-RPM-Packages for GUI-Node"
+      yum:
+        name:
+          - "{{gpfs_gui}}"
+        state: "present"
+      when: "'{{ sps_node3 }}' in inventory_hostname"
+      tags:
+        - rpms
+
+# Starten der GUI
+    - name: "21 - Start the GPFS-GUI on {{ sps_node3 }}"
+      raw: "systemctl start gpfsgui"
+      # when: "'{{ sps_node3 }}' in inventory_hostname"
+
+# Enable the pmcollector and pmsensor
+    - name: "22 - Enable the pmcollectors and pmsensors"
+      raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      # when: "'{{ sps_node3 }}' in inventory_hostname"
+
+# Initialize the performance collection 
+    - name: "23 - Initialize the performance collection"
+      raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+      #when: "'{{ sps_node3 }}' in inventory_hostname"
+      # delegate_to: "sps-patrick3.home.local"
+
+
+# Execute only on Spectrum-Scale-Node1
+#
+# ONLY on NODE1
+#
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure Spectrum-Scale Filesystem"
+  hosts: "{{ sps_node1 }}"
+  vars_files:
+    - "../vars/vars.yaml"
+  gather_facts: false
+  tasks:
 # Create the cluster
     - name: "24 - Create the Cluster with mmcrcluster"
       raw: "{{gpfs_binary_path}}mmcrcluster -N {{sps.sps1.fqdn}}:manager-quorum:{{sps.sps1.hostname}},{{sps.sps2.fqdn}}:manager:{{sps.sps2.hostname}},{{sps.sps3.fqdn}}:manager:{{sps.sps3.hostname}} -C {{sps_cluster_name}}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Assign license to Nodes
     - name: "25 - Assign license with mmchlicense"
       raw: "{{gpfs_binary_path}}mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
       
 # Starten des GPFS-CLusters
     - name: "26 - Start the GPFS-Cluster on all nodes with mmstartup"
@@ -204,12 +232,12 @@
         src: "../configs/StanzaFile.j2"
         dest: "{{dir_root}}StanzaFile"
         mode: "0644"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Create NSDs for Cluster from Stanza File
     - name: "28 - Create NSDs for the Cluster with mmcrnsd"
       raw: "{{gpfs_binary_path}}mmcrnsd -F {{dir_root}}StanzaFile"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Wait 30 Seconds
     - name: "Wait 30 Seconds..."
@@ -219,7 +247,7 @@
 # Create Filesystem
     - name: "29 - Create Filesystem for the Cluster with mmcrfs"
       raw: "{{gpfs_binary_path}}mmcrfs {{sps_filesystem_fs1}} -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T {{sps_mountpoint_fs1}} -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
         - createfs
 
@@ -228,52 +256,29 @@
       wait_for:
         timeout: 10
 
-
 # Mount Filesystems
     - name: "30 - Mount Filesystems"
       raw: "{{gpfs_binary_path}}mmmount all -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
-# Starten der GUI
-    - name: "31 - Start the GPFS-GUI on {{ sps_node3 }}"
-      raw: "systemctl start gpfsgui"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
-
-# Enable the pmcollector and pmsensor
-    - name: "32 - Enable the pmcollectors and pmsensors"
-      raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
-
-# Initialize the performance collection 
-    - name: "33 - Initialize the performance collection"
-      raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      #when: "'{{ sps_node3 }}' in inventory_hostname"
-      delegate_to: "sps-patrick3.home.local"
-
-- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure Spectrum-Scale Filesystem"
-  hosts: "{{ sps_node1 }}"
-  vars_files:
-    - "../vars/vars.yaml"
-  gather_facts: false
-  tasks:
 
 # Configure the Quota
-    - name: "34 - Configure Quota"
+    - name: "31 - Configure Quota"
       raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} -Q yes"
       # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the enforceFilesetQuotaOnRoot
-    - name: "35 - Configure enforceFilesetQuotaOnRoot"
+    - name: "32 - Configure enforceFilesetQuotaOnRoot"
       raw: "{{gpfs_binary_path}}mmchconfig enforceFilesetQuotaOnRoot=yes -i"
       # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the controlSetxattrImmutableSELinux
-    - name: "36 - Configure controlSetxattrImmutableSELinux"
+    - name: "33 - Configure controlSetxattrImmutableSELinux"
       raw: "{{gpfs_binary_path}}mmchconfig controlSetxattrImmutableSELinux=yes -i"
       # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the --filesetdf
-    - name: "37 - Configure --filesetdf"
+    - name: "34 - Configure --filesetdf"
       raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} --filesetdf"
       # when: "'{{ sps_node1 }}' in inventory_hostname"
 
