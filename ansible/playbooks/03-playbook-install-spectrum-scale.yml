@@ -250,6 +250,32 @@
       #when: "'{{ sps_node3 }}' in inventory_hostname"
       delegate_to: "sps-patrick3.home.local"
 
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure Spectrum-Scale Filesystem"
+  hosts: "{{ sps_node1 }}"
+  vars_files:
+    - "../vars/vars.yaml"
+  gather_facts: false
+  tasks:
+
+# Configure the Quota
+    - name: "34 - Configure Quota"
+      raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} -Q yes"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# Configure the enforceFilesetQuotaOnRoot
+    - name: "35 - Configure enforceFilesetQuotaOnRoot"
+      raw: "{{gpfs_binary_path}}mmchconfig enforceFilesetQuotaOnRoot=yes -i"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# Configure the controlSetxattrImmutableSELinux
+    - name: "36 - Configure controlSetxattrImmutableSELinux"
+      raw: "{{gpfs_binary_path}}mmchconfig controlSetxattrImmutableSELinux=yes -i"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# Configure the --filesetdf
+    - name: "37 - Configure --filesetdf"
+      raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} --filesetdf"
+      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 
 
