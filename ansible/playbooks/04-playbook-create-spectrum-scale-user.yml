@@ -7,8 +7,8 @@
     - name: "Create User on GUI-Node"
       raw: "{{ item }}"
       with_items:
-        - "/usr/lpp/mmfs/gui/cli/mkuser patrick -p Test1234 -g SecurityAdmin"
-        - "/usr/lpp/mmfs/gui/cli/mkuser csiadmin -p Test1234 -g CsiAdmin"
-        - "/usr/lpp/mmfs/gui/cli/mkusergrp ContainerOperator --role containeroperator"
-        - "/usr/lpp/mmfs/gui/cli/mkuser cnss_storage_gui_user -p cnss_storage_gui_password -g ContainerOperator"
+        - "/usr/lpp/mmfs/gui/cli/mkuser {{user_security_admin}} -p {{pass_security_admin}} -g SecurityAdmin"
+        - "/usr/lpp/mmfs/gui/cli/mkuser {{user_csi_admin}} -p {{pass_csi_admin}} -g CsiAdmin"
+        - "/usr/lpp/mmfs/gui/cli/mkusergrp {{grp_containeroperator}} --role {{role_containeroperator}}"
+        - "/usr/lpp/mmfs/gui/cli/mkuser {{user_cnsa_storage_gui}} -p {{pass_cnsa_storage_gui}} -g ContainerOperator"
       when: "'{{ sps_node1 }}' in inventory_hostname"

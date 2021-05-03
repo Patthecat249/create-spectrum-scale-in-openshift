@@ -71,8 +71,14 @@ network:
     ip: "10.0.249.53" # DNS-Server-IP-Adress
 
 # Spectrum-Scale specific settings
+user_security_admin: "patrick"
+pass_security_admin: "Test1234"
+
 # Spectrum-Scale-Container-Native-Storage-Access (CNSA)
 user_cnsa_storage_gui: "cnsa"
+user_csi_admin: "csiadmin"
+pass_cnsa_storage_gui: "Test1234"
+pass_csi_admin: "Test1234"
 grp_containeroperator: "ContainerOperator" # Case-sensitive
 role_containeroperator: "containeroperator" # Case-sensitive
 
