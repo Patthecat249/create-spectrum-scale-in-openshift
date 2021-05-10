@@ -189,6 +189,10 @@
     - name: "21 - Start the GPFS-GUI on {{ sps_node3 }}"
       raw: "systemctl start gpfsgui"
 
+# Wait 60 Seconds
+    - name: "Wait 60 Seconds...for starting up GUI"
+      wait_for:
+        timeout: 60
 
 
 # Execute only on Spectrum-Scale-Node1
