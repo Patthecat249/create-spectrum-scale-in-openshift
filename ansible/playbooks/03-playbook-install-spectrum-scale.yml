@@ -188,7 +188,6 @@
 # Starten der GUI
     - name: "21 - Start the GPFS-GUI on {{ sps_node3 }}"
       raw: "systemctl start gpfsgui"
-      # when: "'{{ sps_node3 }}' in inventory_hostname"
 
 # Enable the pmcollector and pmsensor
     # - name: "22 - Enable the pmcollectors and pmsensors"
