@@ -189,16 +189,6 @@
     - name: "21 - Start the GPFS-GUI on {{ sps_node3 }}"
       raw: "systemctl start gpfsgui"
 
-# Enable the pmcollector and pmsensor
-    # - name: "22 - Enable the pmcollectors and pmsensors"
-    #   raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-    #   # when: "'{{ sps_node3 }}' in inventory_hostname"
-
-# Initialize the performance collection 
-    # - name: "23 - Initialize the performance collection"
-    #   raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-    #   #when: "'{{ sps_node3 }}' in inventory_hostname"
-    #   # delegate_to: "sps-patrick3.home.local"
 
 
 # Execute only on Spectrum-Scale-Node1
@@ -299,4 +289,19 @@
       raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} --filesetdf"
 
 
+# Execute on only on one node Node
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure GUI"
+  hosts: "{{ sps_node3 }}"
+  vars_files:
+    - "../vars/vars.yaml"
+  gather_facts: false
+  tasks:
+
+# Enable the pmcollector and pmsensor
+    - name: "22 - Enable the pmcollectors and pmsensors"
+      raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+
+# Initialize the performance collection 
+    - name: "23 - Initialize the performance collection"
+      raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
 
