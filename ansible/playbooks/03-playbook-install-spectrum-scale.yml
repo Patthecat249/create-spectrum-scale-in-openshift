@@ -181,7 +181,7 @@
         name:
           - "{{gpfs_gui}}"
         state: "present"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
+      # when: "'{{ sps_node3 }}' in inventory_hostname"
       tags:
         - rpms
 
