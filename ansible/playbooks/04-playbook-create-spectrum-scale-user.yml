@@ -1,5 +1,5 @@
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook - Create Spectrum-Scale-Users"
-  hosts: "spectrumscale"
+  hosts: "{{ sps_node3 }}"
   gather_facts: false
   vars_files:
     - "../vars/vars.yaml"
@@ -11,4 +11,4 @@
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_csi_admin}} -p {{pass_csi_admin}} -g CsiAdmin"
         - "/usr/lpp/mmfs/gui/cli/mkusergrp {{grp_containeroperator}} --role {{role_containeroperator}}"
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_cnsa_storage_gui}} -p {{pass_cnsa_storage_gui}} -g ContainerOperator"
-      when: "'{{ sps_node3 }}' in inventory_hostname"
+      # when: "'{{ sps_node3 }}' in inventory_hostname"
