@@ -221,10 +221,31 @@
     - name: "25 - Assign license with mmchlicense"
       raw: "{{gpfs_binary_path}}mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
       # when: "'{{ sps_node1 }}' in inventory_hostname"
-      
-# Starten des GPFS-CLusters
+
+# Execute on all SpectrumScale-Nodes
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Start Spectrum-Scale Filesystem"
+  hosts: "spectrumscale"
+  vars_files:
+    - "../vars/vars.yaml"
+  gather_facts: false
+  tasks:     
+# Starten des GPFS-CLusters on all nodes
     - name: "26 - Start the GPFS-Cluster on all nodes with mmstartup"
       raw: "{{gpfs_binary_path}}mmstartup"
+
+# Wait 60 Seconds
+    - name: "Wait 60 Seconds...for starting up GPFS on all nodes"
+      wait_for:
+        timeout: 60
+
+
+# Execute on only on one node Node
+- name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure the Spectrum-Scale Filesystem"
+  hosts: "{{ sps_node1 }}"
+  vars_files:
+    - "../vars/vars.yaml"
+  gather_facts: false
+  tasks:
 
 # Create Stanza File from template
     - name: "27 - Create Stanza-File from template"
@@ -232,22 +253,24 @@
         src: "../configs/StanzaFile.j2"
         dest: "{{dir_root}}StanzaFile"
         mode: "0644"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
+
+# Wait 5 Seconds
+    - name: "Wait 5 Seconds..."
+      wait_for:
+        timeout: 5
 
 # Create NSDs for Cluster from Stanza File
     - name: "28 - Create NSDs for the Cluster with mmcrnsd"
       raw: "{{gpfs_binary_path}}mmcrnsd -F {{dir_root}}StanzaFile"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Wait 30 Seconds
-    - name: "Wait 30 Seconds..."
+    - name: "Wait a Minute...for becoming nsds ready on all nodes"
       wait_for:
-        timeout: 30
+        timeout: 60
 
 # Create Filesystem
     - name: "29 - Create Filesystem for the Cluster with mmcrfs"
       raw: "{{gpfs_binary_path}}mmcrfs {{sps_filesystem_fs1}} -F {{dir_root}}StanzaFile -A yes -B 2M -j scatter -L 128M -n 2 -S relatime -r 2 -m 2 -T {{sps_mountpoint_fs1}} -Q yes --filesetdf --perfileset-quota --inode-limit 2M:100K"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
       tags:
         - createfs
 
@@ -259,28 +282,22 @@
 # Mount Filesystems
     - name: "30 - Mount Filesystems"
       raw: "{{gpfs_binary_path}}mmmount all -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
-
 
 # Configure the Quota
     - name: "31 - Configure Quota"
       raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} -Q yes"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the enforceFilesetQuotaOnRoot
     - name: "32 - Configure enforceFilesetQuotaOnRoot"
       raw: "{{gpfs_binary_path}}mmchconfig enforceFilesetQuotaOnRoot=yes -i"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the controlSetxattrImmutableSELinux
     - name: "33 - Configure controlSetxattrImmutableSELinux"
       raw: "{{gpfs_binary_path}}mmchconfig controlSetxattrImmutableSELinux=yes -i"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 # Configure the --filesetdf
     - name: "34 - Configure --filesetdf"
       raw: "{{gpfs_binary_path}}mmchfs {{sps_filesystem_fs1}} --filesetdf"
-      # when: "'{{ sps_node1 }}' in inventory_hostname"
 
 
 
