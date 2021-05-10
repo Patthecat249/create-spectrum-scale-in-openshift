@@ -191,15 +191,15 @@
       # when: "'{{ sps_node3 }}' in inventory_hostname"
 
 # Enable the pmcollector and pmsensor
-    - name: "22 - Enable the pmcollectors and pmsensors"
-      raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      # when: "'{{ sps_node3 }}' in inventory_hostname"
+    # - name: "22 - Enable the pmcollectors and pmsensors"
+    #   raw: "{{gpfs_binary_path}}mmperfmon config generate --collectors {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+    #   # when: "'{{ sps_node3 }}' in inventory_hostname"
 
 # Initialize the performance collection 
-    - name: "23 - Initialize the performance collection"
-      raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      #when: "'{{ sps_node3 }}' in inventory_hostname"
-      # delegate_to: "sps-patrick3.home.local"
+    # - name: "23 - Initialize the performance collection"
+    #   raw: "{{gpfs_binary_path}}mmchnode --perfmon -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
+    #   #when: "'{{ sps_node3 }}' in inventory_hostname"
+    #   # delegate_to: "sps-patrick3.home.local"
 
 
 # Execute only on Spectrum-Scale-Node1
