@@ -4,6 +4,14 @@
   vars_files:
     - "../vars/vars.yaml"
   tasks:
+    # Wait script einbauen
+    - name: "Wait until GUI is running (not thawing)"
+      shell: "systemctl status gpfsgui | grep running"
+      register: cmd_res
+      retries: 90
+      delay: 30
+      until: cmd_res.stdout_lines | list | count >= 1
+
     - name: "Create User on GUI-Node"
       raw: "{{ item }}"
       with_items:
