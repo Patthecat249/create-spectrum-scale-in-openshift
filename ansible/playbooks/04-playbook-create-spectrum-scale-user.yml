@@ -19,4 +19,5 @@
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_csi_admin}} -p {{pass_csi_admin}} -g CsiAdmin"
         # - "/usr/lpp/mmfs/gui/cli/mkusergrp {{grp_containeroperator}} --role {{role_containeroperator}}"
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_cnsa_storage_gui}} -p \'{{pass_cnsa_storage_gui}}\' -g ContainerOperator"
+        - "/usr/lpp/mmfs/gui/cli/mkuser {{user_cnss}} -p \'{{pass_cnss}}\' -g ContainerOperator"
       # when: "'{{ sps_node3 }}' in inventory_hostname"
