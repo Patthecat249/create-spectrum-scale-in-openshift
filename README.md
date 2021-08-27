@@ -1,10 +1,10 @@
-# Create "IBM-Spectrum-Scale" on three VMs (CentOS8.3) in DEV-Environment and Deploy "IBM Spectrum Scale CSI Plugin Operator" in OpenShift-Cluster
-This installs and configures IBM Spectrum Scale on three virtual machines. The virtual machines will be deployed with terraform. IBM Spectrum Scale will be installed and configured with Ansible.
+# This creates an "IBM-Spectrum-Scale-Storage-Cluster" on three VMs (CentOS8.3) as a prerequisite for Spectrum-Scale-CNSA on OpenShift. 
+This installs and configures IBM Spectrum Scale on three virtual machines. The virtual machines will be deployed with terraform. IBM Spectrum Scale will be installed and configured with Ansible automatically.
 
 
 
-## How to use
-1. #### Download Spectrum-Scale-Install-File from IBM Fix Central
+## How to use ()
+1. #### Prerequisite - Download Spectrum-Scale-Install-File from IBM Fix Central
     https://www.ibm.com/support/fixcentral/
 
   **Product Group:** `System Storage`
@@ -26,10 +26,10 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 copy downloaded-file to ansible-control-node into directory /opt/sva/spectrumscale/
 ```
 
-2. #### Customize variables in "vars/vars.yaml"
+2. #### Prerequisite - Customize variables in "vars/vars.yaml"
 You have to customize all variables you like to in the central vars_file. Especially IP-Adresses, Hostnames, VMware Settings
 
-3. #### Login on terraform-host (VM)
+3. #### Login to the installation-Host from where to Install the Spectrum-Scale-Cluster
 
    ```bash
    ssh root@terraform.home.local
