@@ -29,19 +29,19 @@ kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
 gpfs_binary_path: "/usr/lpp/mmfs/bin/"
 
 # Variables for Install GPFS-RPM-Packages
-gpfs_base: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-0.x86_64.rpm"
+gpfs_base: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-2.x86_64.rpm"
 gpfs_gskit: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.x86_64.rpm"
-gpfs_license: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-0.x86_64.rpm"
-gpfs_java: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-0.x86_64.rpm"
-gpfs_gpl: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-0.noarch.rpm"
-gpfs_docs: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.docs-5.1.1-0.noarch.rpm"
-gpfs_pmsensors: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.1-0.el8.x86_64.rpm"
-gpfs_pmcollector: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.1-0.el8.x86_64.rpm"
-gpfs_msg: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.msg.en_US-5.1.1-0.noarch.rpm"
-gpfs_compression: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.compression-5.1.1-0.x86_64.rpm"
+gpfs_license: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-2.x86_64.rpm"
+gpfs_java: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-2.x86_64.rpm"
+gpfs_gpl: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-2.noarch.rpm"
+gpfs_docs: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.docs-5.1.1-2.noarch.rpm"
+gpfs_pmsensors: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.1-2.el8.x86_64.rpm"
+gpfs_pmcollector: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.1-2.el8.x86_64.rpm"
+gpfs_msg: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.msg.en_US-5.1.1-2.noarch.rpm"
+gpfs_compression: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.compression-5.1.1-2.x86_64.rpm"
 
 # GUI
-gpfs_gui: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gui-5.1.1-0.noarch.rpm"
+gpfs_gui: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gui-5.1.1-2.noarch.rpm"
 
 # --- VMware Settings --- #
 # VMware-Settings
