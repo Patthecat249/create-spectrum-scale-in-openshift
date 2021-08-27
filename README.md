@@ -3,7 +3,7 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 
 
 
-## How to use ()
+## How to use
 1. #### Prerequisite - Download Spectrum-Scale-Install-File from IBM Fix Central
     https://www.ibm.com/support/fixcentral/
 
