@@ -25,7 +25,9 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 https://www.ibm.com/docs/en/spectrum-scale/5.0.5?topic=overview-spectrum-scale-product-editions
 
 ```bash
-copy downloaded-file to ansible-control-node into directory /opt/sva/spectrumscale/
+copy spectrum-scale-install-file to ansible-control-node into directory /opt/sva/spectrumscale/
+ssh root@installvm
+cp /mnt/openshift/downloaded-iso/spectrum-scale/Spectrum_Scale_Data_Access-5.1.1.3-x86_64-Linux-install /opt/sva/spectrumscale/
 ```
 
 2. #### Prerequisite - Customize variables in "vars/vars.yaml"
@@ -59,7 +61,7 @@ You have to customize all variables you like to in the central vars_file. Especi
 2. #### Create the virtual machines
 
    ```bash
-   cd ~/git/spectrum-scale/ansible/ && ansible-playbook 01-install-spectrum-scale-vms.yaml
+   cd ~/git/spectrum-scale/ansible/playbooks/ && ansible-playbook 01-install-spectrum-scale-vms.yaml
    ```
 
    

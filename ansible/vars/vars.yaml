@@ -26,9 +26,9 @@ kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
 kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
 
 # Download-Files
-sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"
-sps_tar_filename: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
-Spectrum_Scale_Data_Access-{{sps_version}}-x86_64-Linux-install
+sps_install_filename: "Spectrum_Scale_Data_Access-{{sps_version}}-x86_64-Linux-install"
+sps_tar_filename: "Spectrum_Scale_Data_Access-{{sps_version}}_x86_64.tar.gz"
+
 
 # GPFS-Binary-Path
 gpfs_binary_path: "/usr/lpp/mmfs/bin/"
