@@ -15,12 +15,14 @@ This installs and configures IBM Spectrum Scale on three virtual machines. The v
 
   **Select from Software defined storage:** `IBM Spectrum Scale`
 
-  **Installed Version:** `5.1.0`
+  **Installed Version:** `5.1.1`
 
   **Platform:** `Linux 64-bit,x86_64`
 
-  **Download:** `Spectrum_Scale_Standard-5.1.0.3-x86_64-Linux-install`
+  **Download:** `Spectrum_Scale_Data_Access-5.1.1.3-x86_64-Linux-install`
 
+### Informationen zun den Spectrum-Scale-Editionen: 
+https://www.ibm.com/docs/en/spectrum-scale/5.0.5?topic=overview-spectrum-scale-product-editions
 
 ```bash
 copy downloaded-file to ansible-control-node into directory /opt/sva/spectrumscale/
@@ -40,7 +42,6 @@ You have to customize all variables you like to in the central vars_file. Especi
    yum install sshpass -y
    # dnf install sshpass -y
    ```
-
    
 
 4. #### All-In-One-Playbook

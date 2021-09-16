@@ -25,23 +25,28 @@ url_kernel_header: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/
 kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
 kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
 
+# Download-Files
+sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"
+sps_tar_filename: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
+Spectrum_Scale_Data_Access-{{sps_version}}-x86_64-Linux-install
+
 # GPFS-Binary-Path
 gpfs_binary_path: "/usr/lpp/mmfs/bin/"
 
 # Variables for Install GPFS-RPM-Packages
-gpfs_base: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-2.x86_64.rpm"
+gpfs_base: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-5.1.1-3.x86_64.rpm"
 gpfs_gskit: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.x86_64.rpm"
-gpfs_license: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-2.x86_64.rpm"
-gpfs_java: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-2.x86_64.rpm"
-gpfs_gpl: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-2.noarch.rpm"
-gpfs_docs: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.docs-5.1.1-2.noarch.rpm"
-gpfs_pmsensors: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.1-2.el8.x86_64.rpm"
-gpfs_pmcollector: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.1-2.el8.x86_64.rpm"
-gpfs_msg: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.msg.en_US-5.1.1-2.noarch.rpm"
-gpfs_compression: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.compression-5.1.1-2.x86_64.rpm"
+gpfs_license: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.std-5.1.1-3.x86_64.rpm"
+gpfs_java: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-5.1.1-3.x86_64.rpm"
+gpfs_gpl: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-5.1.1-3.noarch.rpm"
+gpfs_docs: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.docs-5.1.1-3.noarch.rpm"
+gpfs_pmsensors: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmsensors-5.1.1-3.el8.x86_64.rpm"
+gpfs_pmcollector: "/usr/lpp/mmfs/{{sps_version}}/zimon_rpms/rhel8/gpfs.gss.pmcollector-5.1.1-3.el8.x86_64.rpm"
+gpfs_msg: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.msg.en_US-5.1.1-3.noarch.rpm"
+gpfs_compression: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.compression-5.1.1-3.x86_64.rpm"
 
 # GUI
-gpfs_gui: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gui-5.1.1-2.noarch.rpm"
+gpfs_gui: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gui-5.1.1-3.noarch.rpm"
 
 # --- VMware Settings --- #
 # VMware-Settings
@@ -57,11 +62,11 @@ vsphere_network_home: "dpg-home-prod"
 vsphere_folder: "/dc-home/vm/spectrumscale"
 vsphere_sps_cpu: "8"
 vsphere_sps_ram: "16384"
-vsphere_guest_id: "centos8_64Guest"
+vsphere_guest_id: "rhel8_64Guest"
 vsphere_vm_boot_delay: "90000"
 vsphere_hardware_version: "13"
 vsphere_hardware_version_non_coreos: "14"
-vsphere_vmtemplate_name: "template-centos83-16gb"
+vsphere_vmtemplate_name: "rhel83-template"
 
 # Central Network-Settings
 network:
@@ -84,11 +89,9 @@ pass_csi_admin: "Test1234"
 grp_containeroperator: "ContainerOperator" # Case-sensitive
 role_containeroperator: "containeroperator" # Case-sensitive
 
-sps_version: "5.1.1.2"
+sps_version: "5.1.1.3"
 sps_filesystem_version: "5.1.1.1"
 spectrumscale_cmd: "/usr/lpp/mmfs/{{sps_version}}/installer/spectrumscale"
-sps_install_filename: "Spectrum_Scale_Standard-{{sps_version}}-x86_64-Linux-install"
-sps_tar_filename: "Scale_std_install-{{sps_version}}_x86_64.tar.gz"
 sps_cluster_name: "sps.home.local"
 sps_setup_node_ip: "10.0.249.161"
 sps_ntp_ip1: "10.0.249.1"
