@@ -103,7 +103,7 @@ resource "vsphere_virtual_machine" "{{sps.sps1.hostname}}" {
   }
   disk {
     label = "rootvolume"
-    size  = "16"
+    size  = "120"
     thin_provisioned  = "false"
     eagerly_scrub = "true"
   }
@@ -178,7 +178,7 @@ resource "vsphere_virtual_machine" "{{sps.sps2.hostname}}" {
   }
   disk {
     label = "rootvolume"
-    size  = "16"
+    size  = "120"
     thin_provisioned  = "false"
     eagerly_scrub = "true"
   }
@@ -253,7 +253,7 @@ resource "vsphere_virtual_machine" "{{sps.sps3.hostname}}" {
   }
   disk {
     label = "rootvolume"
-    size  = "16"
+    size  = "120"
     thin_provisioned  = "false"
     eagerly_scrub = "true"
   }
