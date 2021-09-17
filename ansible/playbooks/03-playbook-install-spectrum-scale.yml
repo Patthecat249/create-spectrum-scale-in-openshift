@@ -122,6 +122,7 @@
           - "{{gpfs_msg}}"
           - "{{gpfs_compression}}"
         state: "present"
+        disable_gpg_check: "yes"
       tags:
         - rpms
 
