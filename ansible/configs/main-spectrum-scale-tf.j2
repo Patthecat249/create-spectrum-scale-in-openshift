@@ -46,7 +46,7 @@ variable "vm_name_sps3" {
 }
 
 variable "sps_guest_id_tag" {
-  default = "rhel8_64Guest"
+  default = "{{vsphere_guest_id}}"
 }
 
 data "vsphere_virtual_machine" "template" {
