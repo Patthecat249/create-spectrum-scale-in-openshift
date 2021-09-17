@@ -31,8 +31,14 @@
         password: "{{subscription_pass}}"
         autosubscribe: "true"
 
+    - name: "03 - Install epel-release"
+      yum:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+        state: present
+
+
 # Install software-packages
-    - name: "03 - Install sshpass"
+    - name: "04 - Install sshpass"
       yum:
         name: "sshpass"
         state: present
