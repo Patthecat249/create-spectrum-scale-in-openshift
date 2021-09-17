@@ -91,7 +91,7 @@ resource "vsphere_virtual_machine" "{{sps.sps1.hostname}}" {
   num_cpus = "{{vsphere_sps_cpu}}"
   memory = "{{vsphere_sps_ram}}"
   scsi_controller_count = 2
-  scsi_type = "lsilogic-sas"
+  scsi_type = "pvscsi"
   scsi_bus_sharing = "virtualSharing"
   boot_delay = 0
   wait_for_guest_ip_timeout = 0
@@ -166,7 +166,7 @@ resource "vsphere_virtual_machine" "{{sps.sps2.hostname}}" {
   num_cpus = "{{vsphere_sps_cpu}}"
   memory = "{{vsphere_sps_ram}}"
   scsi_controller_count = 2
-  scsi_type = "lsilogic-sas"
+  scsi_type = "pvscsi"
   scsi_bus_sharing = "virtualSharing"
   boot_delay = 0
   wait_for_guest_ip_timeout = 0
@@ -241,7 +241,7 @@ resource "vsphere_virtual_machine" "{{sps.sps3.hostname}}" {
   num_cpus = "{{vsphere_sps_cpu}}"
   memory = "{{vsphere_sps_ram}}"
   scsi_controller_count = 2
-  scsi_type = "lsilogic-sas"
+  scsi_type = "pvscsi"
   scsi_bus_sharing = "virtualSharing"
   boot_delay = 0
   wait_for_guest_ip_timeout = 0
