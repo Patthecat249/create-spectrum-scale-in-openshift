@@ -9,17 +9,29 @@
         dest: "/etc/hosts"
         force: "true"
 
-    - name: "02 - Install Epel-Release"
-      yum:
-        name: "epel-release"
-        state: present
+# Erstellung des Inventory-Files im lokalen Ordner
+    - name: "03 - Create main.tf-file"
+      template:
+        src: "../configs/inventory.j2"
+        dest: "inventory"
 
+# Beim Aufruf des Playbook, müssen der Username und das Passwort für die Subscription mit angegeben werden
+    - name: "02 - Execute subsciption-manager and auto-subscribe to available content."
+      redhat_subscription:
+        state: "present"
+        username: "{{subscription_user}}"
+        password: "{{subscription_pass}}"
+        autosubscribe: "true"
+
+# Install software-packages
     - name: "03 - Install sshpass"
       yum:
         name: "sshpass"
         state: present
       tags:
       - ssh
+
+# SSH-Key-Erstellung auf Control-Node
     - name: "04 - Create SSH-KEYPAIR on localhost to use from Ansible-Control-Node"
       openssh_keypair:
         path: "/root/.ssh/id_rsa"
@@ -27,11 +39,14 @@
         type: "rsa"
       tags:
       - ssh
+
+# Kopieren des Rootpasswords in der Datei auf die Managed-Nodes
     - name: "05 - Copy ../configs/rootpassword-file from Ansible-Control-Node to Managed SPS-Nodes"
       copy:
         src: "../configs/rootpassword"
         dest: "/root/rootpassword"
 
+# Verteilen der Public-Keys auf alle Nodes
     - name: "06 - Distribute SSH-Pub-Keys to Managed-SPS-Nodes"
       raw: "{{ item }}"
       with_items:
