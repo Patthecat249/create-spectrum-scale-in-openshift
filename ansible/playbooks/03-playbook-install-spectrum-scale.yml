@@ -206,6 +206,7 @@
         name:
           - "{{gpfs_gui}}"
         state: "present"
+        disable_gpg_check: "yes"
       # when: "'{{ sps_node3 }}' in inventory_hostname"
       tags:
         - rpms
