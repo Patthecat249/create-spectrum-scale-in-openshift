@@ -22,6 +22,7 @@ sps:
 # Dependencies CentOS8.3
 url_kernel_devel: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_devel}}"
 url_kernel_header: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_header}}"
+https://access.cdn.redhat.com/content/origin/rpms/kernel-headers/4.18.0/240.23.2.el8_3/fd431d51/kernel-headers-4.18.0-240.23.2.el8_3.x86_64.rpm
 kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
 kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
 
