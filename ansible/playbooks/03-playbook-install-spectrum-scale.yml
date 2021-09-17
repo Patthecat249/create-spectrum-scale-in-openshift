@@ -80,14 +80,14 @@
 # Install kernel-devel
     - name: "10 - Install Kernel Devel"
       yum:
-        name: "kernel-devel-4.18.0-240.22.1.el8_3.x86_64"
+        name: "kernel-devel-4.18.0-240.el8.x86_64"
         allow_downgrade: yes
         state: present
 
 # Install kernel-header
     - name: "11 - Install Kernel Header"
       yum:
-        name: "kernel-headers-4.18.0-240.22.1.el8_3.x86_64"
+        name: "kernel-devel-4.18.0-240.el8.x86_64"
         allow_downgrade: yes
         state: present
 
