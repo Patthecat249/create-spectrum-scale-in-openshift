@@ -7,26 +7,22 @@
     - "../vars/vars.yaml"
   gather_facts: false
   tasks:
-    - name: "01 - Add EPEL-Release-Repo on CentOS"
-      yum:
-        name: epel-release.noarch
-        state: present
 
 # Install Software packages
     - name: "02 - Install necassary software programs"
       become: "true"
       yum:
         name:
-          - bind-utils.x86_64
-          - nfs-utils.x86_64
+          - bind-utils
+          - nfs-utils
           - net-tools
-          - chrony.x86_64
-          - cpp.x86_64
-          - gcc.x86_64
-          - gcc-c++.x86_64
+          - chrony
+          - cpp
+          - gcc
+          - gcc-c++
           - python3
-          - elfutils.x86_64
-          - elfutils-devel.x86_64
+          - elfutils
+          - elfutils-devel
         state: "present"
 
     - name: "03 - Check if folder {{ dir_root }} exists"
@@ -69,28 +65,28 @@
         dest: "{{dir_root}}{{sps_install_filename}}"
         mode: "0755"
 
-    - name: "08 - Download Kernel-Devel"
-      get_url:
-        url: "{{url_kernel_devel}}"
-        dest: "{{ dir_root }}/{{kernel_devel}}"
+    # - name: "08 - Download Kernel-Devel"
+    #   get_url:
+    #     url: "{{url_kernel_devel}}"
+    #     dest: "{{ dir_root }}/{{kernel_devel}}"
 
 
-    - name: "09 - Download Kernel-Header"
-      get_url:
-        url: "{{url_kernel_header}}"
-        dest: "{{ dir_root }}/{{kernel_header}}"
+    # - name: "09 - Download Kernel-Header"
+    #   get_url:
+    #     url: "{{url_kernel_header}}"
+    #     dest: "{{ dir_root }}/{{kernel_header}}"
 
 
-    - name: "10 - Install Kernel Devel"
-      yum:
-        name: "{{ dir_root }}/{{kernel_devel}}"
-        allow_downgrade: yes
-        state: present
-    - name: "11 - Install Kernel Header"
-      yum:
-        name: "{{ dir_root }}/{{kernel_header}}"
-        allow_downgrade: yes
-        state: present
+    # - name: "10 - Install Kernel Devel"
+    #   yum:
+    #     name: "{{ dir_root }}/{{kernel_devel}}"
+    #     allow_downgrade: yes
+    #     state: present
+    # - name: "11 - Install Kernel Header"
+    #   yum:
+    #     name: "{{ dir_root }}/{{kernel_header}}"
+    #     allow_downgrade: yes
+    #     state: present
 
 # the epel-release must be removed for sps-prerequisites
     - name: "12 - Remove EPEL-Release-Repo"
