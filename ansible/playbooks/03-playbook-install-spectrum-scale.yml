@@ -86,7 +86,7 @@
 # Install kernel-header
     - name: "11 - Install Kernel Header"
       yum:
-        name: "kernel-header}}"
+        name: "kernel-headers"
         state: present
 
 # the epel-release must be removed for sps-prerequisites
