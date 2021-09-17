@@ -31,6 +31,7 @@
         password: "{{subscription_pass}}"
         autosubscribe: "true"
 
+# Enable EPEL-Release to install SSHPASS
     - name: "03 - Install epel-release"
       yum:
         name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
