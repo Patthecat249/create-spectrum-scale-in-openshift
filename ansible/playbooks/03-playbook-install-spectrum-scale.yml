@@ -77,16 +77,17 @@
     #     dest: "{{ dir_root }}/{{kernel_header}}"
 
 
-    # - name: "10 - Install Kernel Devel"
-    #   yum:
-    #     name: "{{ dir_root }}/{{kernel_devel}}"
-    #     allow_downgrade: yes
-    #     state: present
-    # - name: "11 - Install Kernel Header"
-    #   yum:
-    #     name: "{{ dir_root }}/{{kernel_header}}"
-    #     allow_downgrade: yes
-    #     state: present
+# Install kernel-devel
+    - name: "10 - Install Kernel Devel"
+      yum:
+        name: "kernel-devel"
+        state: present
+
+# Install kernel-header
+    - name: "11 - Install Kernel Header"
+      yum:
+        name: "kernel-header}}"
+        state: present
 
 # the epel-release must be removed for sps-prerequisites
     - name: "12 - Remove EPEL-Release-Repo"
