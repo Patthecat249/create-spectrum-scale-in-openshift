@@ -25,11 +25,13 @@
           - elfutils-devel
         state: "present"
 
+# Check Prerequisites 
     - name: "03 - Check if folder {{ dir_root }} exists"
       stat:
         path: "{{ dir_root }}"
       register: folder_details
 
+# Create Directories
     - name: "04 - Create Directoy {{ dir_root }}"
       file:
         recurse: "true"
@@ -41,6 +43,7 @@
       when:
         - not folder_details.stat.exists
     
+# Create Spectrum-Scale Directory
     - name: "05 - Create Spectrum-Scale-Mountpoint-Directory"
       file:
         recurse: "true"
@@ -49,6 +52,7 @@
       with_items:
         - "{{ dest_nas_mount_path }}"
 
+# Check if tar-file was already copied
     - name: "06 - Check if {{ dir_root }}{{ sps_install_filename }} exists on Remote-Machine in dir_rootectory"
       stat:
         path: "{{ dir_root }}{{ sps_install_filename }}"
@@ -64,6 +68,8 @@
         src: "{{dir_root}}{{sps_install_filename}}"
         dest: "{{dir_root}}{{sps_install_filename}}"
         mode: "0755"
+      when:
+        - not tar_details.stat.exists
 
     # - name: "08 - Download Kernel-Devel"
     #   get_url:
@@ -189,8 +195,7 @@
         - retry
 
 
-
-# Execute only on Spectrum-Scale-GUI-Node
+### Next PLAY # Execute only on Spectrum-Scale-GUI-Node
 #
 # ONLY on GUI-NODE
 #
@@ -207,7 +212,6 @@
           - "{{gpfs_gui}}"
         state: "present"
         disable_gpg_check: "yes"
-      # when: "'{{ sps_node3 }}' in inventory_hostname"
       tags:
         - rpms
 
