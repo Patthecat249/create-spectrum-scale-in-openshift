@@ -71,7 +71,7 @@ vsphere_guest_id: "rhel8_64Guest"
 vsphere_vm_boot_delay: "90000"
 vsphere_hardware_version: "15"
 vsphere_hardware_version_non_coreos: "15"
-vsphere_vmtemplate_name: "rhel83-template-16gb"
+vsphere_vmtemplate_name: "rhel85-template-16gb"  # RHEL8.5-VMware-Template
 
 # Central Network-Settings
 network:
