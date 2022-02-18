@@ -392,9 +392,9 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
 # IP-Adress of Cluster-Export-Services
     sps_ces_export_ip1: "10.0.249.245"
 # FQDNs of the three Spectrum-Scale-VMs
-    sps_node1: "sps1.home.local"
-    sps_node2: "sps2.home.local"
-    sps_node3: "sps3.home.local"
+    {{sps.sps1.fqdn}}: "sps1.home.local"
+    {{sps.sps2.fqdn}}: "sps2.home.local"
+    {{sps.sps3.fqdn}}: "sps3.home.local"
 # The Device-Names of the DISK, which will be created in the terraform-script. 
 # Disk-Unit-Number=1 will be /dev/sdb"
 # Disk-Unit-Number=2 will be /dev/sdc"
@@ -613,7 +613,7 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
       raw: "{{ item }}"
       with_items:
         - "{{ spectrumscale_cmd }} setup -s {{ sps_setup_node_ip }} -i {{ private_root_key }}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "'{{ {{sps.sps1.fqdn}} }}' in inventory_hostname"
 
 # This will configure the Spectrum-Scale-Cluster
 # Defines cluster-anem, ports, protocols, nsd, nodes, and so on
@@ -629,29 +629,29 @@ The following chapters describe the real Installation-Process of Spectrum-Scale.
         - "{{ spectrumscale_cmd }} config protocols -e {{ sps_ces_export_ip1 }}"
         - "{{ spectrumscale_cmd }} enable smb nfs"
         - "{{ spectrumscale_cmd }} config protocols -l"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node1 }} -amnpq"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node2 }} -amnpq"
-        - "{{ spectrumscale_cmd }} node add {{ sps_node3 }} -amnpqg"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node1 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node2 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-        - "{{ spectrumscale_cmd }} nsd add -p {{ sps_node3 }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+        - "{{ spectrumscale_cmd }} node add {{ {{sps.sps1.fqdn}} }} -amnpq"
+        - "{{ spectrumscale_cmd }} node add {{ {{sps.sps2.fqdn}} }} -amnpq"
+        - "{{ spectrumscale_cmd }} node add {{ {{sps.sps3.fqdn}} }} -amnpqg"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ {{sps.sps1.fqdn}} }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ {{sps.sps2.fqdn}} }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ {{sps.sps3.fqdn}} }} -fs {{ sps_filesystem_fs1 }} {{ sps_dev1 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ {{sps.sps1.fqdn}} }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ {{sps.sps2.fqdn}} }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+        - "{{ spectrumscale_cmd }} nsd add -p {{ {{sps.sps3.fqdn}} }} -fs {{ sps_fs2 }} {{ sps_dev2 }}"
+      when: "'{{ {{sps.sps1.fqdn}} }}' in inventory_hostname"
 
 # Spectrum Scale Install Precheck
 # This runs the Install-Prechecker
     - name: "Install Spectrum-Scale --precheck"
       raw: "{{ spectrumscale_cmd }} install --precheck"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "'{{ {{sps.sps1.fqdn}} }}' in inventory_hostname"
 
 # Spectrum Scale Install
 # This must be run as a script and not as 'raw'-command, because it needs on longtime.
 # Appr. time 30-60 minutes
     - name: "Execute spectrumscale-install-deploy.sh - This needs some time appr.30min"
       script: "spectrumscale-install-deploy.sh"
-      when: "'{{ sps_node1 }}' in inventory_hostname"
+      when: "'{{ {{sps.sps1.fqdn}} }}' in inventory_hostname"
 
 ### --- END ANSIBLE-SKRIPT --- ###
 ```
