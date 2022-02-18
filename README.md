@@ -68,12 +68,27 @@ cp /mnt/openshift/downloaded-iso/spectrum-scale/Spectrum_Scale_Data_Access-5.1.2
    # dnf install sshpass -y
    ```
    
-4. #### All-In-One-Playbook
+4. #### Create inventory-file
+
+   ```bash
+   cd ~/git/spectrum-scale/ansible/
+   cat << EOF > inventory
+   [spectrumscale]
+   scale1
+   scale2
+   scale3
+   EOF
+   
+   ```
+
+   
+
+2. #### All-In-One-Playbook
 
    Execute nothing but the "All-In-One-Ansible-Playbook" to install a Spectrum-Scale-Cluster with a single command
 
    ```bash
-   cd ~/git/spectrum-scale/ansible/ && ansible-playbook 00-all-in-one.yaml -e "subscription_user=<username> subscription_pass=<password>"
+   cd ~/git/spectrum-scale/ansible/ && ansible-playbook install-all-in-one.yaml -e "subscription_user=<username> subscription_pass=<password>"
    ```
 
 

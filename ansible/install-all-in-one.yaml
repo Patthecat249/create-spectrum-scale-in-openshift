@@ -27,7 +27,7 @@
         - checkfunction
 
 # Prepare Ansible-Control-Node
-- import_playbook: "playbooks/02-playbook-setup-localhost.yaml"
+- import_playbook: "playbooks/02-playbook-configure-control-and-managed-nodes.yml"
 
 # Enable SSH-Connection on all virtual machines and each other
 - import_playbook: "playbooks/02-playbook-ssh-prepare-setup.yml"

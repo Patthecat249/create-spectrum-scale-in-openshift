@@ -54,6 +54,6 @@
         dest: "{{ dir_spectrumscalenodes }}main.tf"
     
 # Erzeuge die virtuelle Maschine
-    - name: "06 - Create virtual machines ({{ {{sps.sps1.fqdn}} }}, {{ {{sps.sps2.fqdn}} }}, {{ {{sps.sps3.fqdn}} }}) with terraform"
+    - name: "06 - Create virtual machines ({{ sps.sps1.fqdn }}, {{ sps.sps2.fqdn }}, {{ sps.sps3.fqdn }}) with terraform"
       raw: "cd {{ dir_spectrumscalenodes }} && /usr/local/bin/terraform init && /usr/local/bin/terraform apply -auto-approve"
 
