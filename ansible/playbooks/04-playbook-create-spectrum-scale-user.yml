@@ -16,7 +16,7 @@
 
     # Debug-Message
     - name: "Debug-Message"
-      debug: msg="{{ cmd_res.stdout_lines }}"
+      debug: msg="{{ cmd_res.stdout }}"
       tags:
         - debug
 
