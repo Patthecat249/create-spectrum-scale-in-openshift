@@ -6,31 +6,19 @@
   tasks:
     # Stoppe und Starte die GPFSGUI erneut
     - name: "Restarte die GPFSGUI"
-      raw: "systemctl stop gpfsgui && systemctl start gpfsgui"
-
-    - name: "Test1"
-      shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w '%{http_code}' -o /dev/null"
-      register: cmd_res
-      tags:
-        - debug
-
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: gpfsgui
     # Debug-Message
-    - name: "Debug-Message"
-      debug: msg="{{ cmd_res.stdout }}"
-      tags:
-        - debug
+    # - name: "Debug-Message"
+    #   debug: msg="{{ cmd_res.stdout }}"
+    #   tags:
+    #     - debug
 
 
     # Warte bis die GUI komplett initialisiert ist
-    - name: "Wait until GUI return is equal 200"
-      shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w '%{http_code}' -o /dev/null"
-      register: cmd_res
-      retries: 60
-      delay: 10
-      until: cmd_res.stdout == "200"
-
-
-    - name: Pause play until a URL is reachable from this host
+    - name: "Wait until GPFSGUI-Return-Code = 200"
       uri:
         url: "https://scale3"
         follow_redirects: none
@@ -40,8 +28,7 @@
       until: _result.status == 200
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
-      tags:
-        - test
+
 
 # Lege Benutzer in der Scale-GUI an
     - name: "Create User on GUI-Node"
