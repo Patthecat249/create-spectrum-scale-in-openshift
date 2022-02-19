@@ -8,7 +8,7 @@
     - name: "01 - Create inventory-file"
       template:
         src: "../configs/inventory.j2"
-        dest: "inventory"
+        dest: "../inventory"
 
 # Beginn zweites PLAY
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
