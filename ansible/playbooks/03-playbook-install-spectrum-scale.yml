@@ -223,7 +223,7 @@
     #     timeout: 60
 
 # Debug Test
-    - name: "Wait until mmgetstate is active"
+    - name: "Wait until mmgetstate is active (on {{inventory_hostname}})"
       raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate
       tags:
@@ -234,7 +234,7 @@
       tags:
         - testwaituntil1
 
-    - name: "Wait until mmgetstate is active"
+    - name: "Wait until mmgetstate is active (on {{inventory_hostname}})"
       raw: "{{gpfs_binary_path}}mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate
       until: varmmgetstate.stdout_lines == "\"active\""
