@@ -166,7 +166,6 @@
 
 # Starten der GUI
     - name: "21 - Start the GPFS-GUI on {{ sps.sps3.fqdn }}"
-    - name: "Restarte die GPFSGUI"
       systemd:
         state: started
         daemon_reload: yes
