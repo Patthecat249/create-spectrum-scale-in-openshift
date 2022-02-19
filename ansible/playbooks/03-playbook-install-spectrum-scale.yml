@@ -216,35 +216,7 @@
     - name: "26 - Start the GPFS-Cluster on all nodes with mmstartup"
       raw: "{{gpfs_binary_path}}mmstartup"
 
-# Wait 60 Seconds / Wait until mmgestate answers with "active"
-# mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active
-    # - name: "Wait 60 Seconds...for starting up GPFS on all nodes"
-    #   wait_for:
-    #     timeout: 60
 
-# Debug Test
-    - name: "Debug - Wait until mmgetstate is active (on {{inventory_hostname}})"
-      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
-      register: varmmgetstate
-      tags:
-        - testwaituntil1
-# Debug-Message
-    - name: "Debug-Message"
-      debug: msg="{{ varmmgetstate.stdout_lines }}"
-      tags:
-        - testwaituntil1
-
-    - name: "Wait until mmgetstate is active (on {{inventory_hostname}})"
-      raw: "{{gpfs_binary_path}}mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
-      register: varmmgetstate1
-      # until: "varmmgetstate.stdout == 'active'"
-      until: "'active' in varmmgetstate1.stdout"
-      # until: varmmgetstate1.stdout | list | count >= 3
-      # until: (varmmgetstate.rc == 0) and (varmmgetstate.stdout != "")
-      retries: 120 # 120 * 5 seconds = 10 Minutes 
-      delay: 5 # Every 5 seconds
-      tags:
-        - testwaituntil1
 
 
 
@@ -255,6 +227,40 @@
     - "../vars/vars.yaml"
   gather_facts: false
   tasks:
+
+
+# Wait 60 Seconds / Wait until mmgestate answers with "active"
+# mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active
+    # - name: "Wait 60 Seconds...for starting up GPFS on all nodes"
+    #   wait_for:
+    #     timeout: 60
+
+# Debug Test
+    - name: "Debug - Wait until mmgetstate is active (on {{inventory_hostname}})"
+      raw: "/usr/lpp/mmfs/bin/mmgetstate -a -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      register: varmmgetstate
+      tags:
+        - testwaituntil1
+# Debug-Message
+    - name: "Debug-Message"
+      debug: msg="{{ varmmgetstate.stdout_lines }}"
+      tags:
+        - testwaituntil1
+
+    - name: "Wait until mmgetstate is active (on {{inventory_hostname}})"
+      raw: "{{gpfs_binary_path}}mmgetstate -a -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      register: varmmgetstate1
+      # until: "varmmgetstate.stdout == 'active'"
+      # until: "'active' in varmmgetstate1.stdout"
+      until: varmmgetstate1.stdout | list | count >= 3
+      # until: (varmmgetstate.rc == 0) and (varmmgetstate.stdout != "")
+      retries: 120 # 120 * 5 seconds = 10 Minutes 
+      delay: 5 # Every 5 seconds
+      tags:
+        - testwaituntil1
+
+
+
 
 # Create Stanza File from template
     - name: "27 - Create Stanza-File from template"
