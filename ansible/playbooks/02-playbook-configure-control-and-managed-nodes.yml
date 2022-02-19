@@ -7,7 +7,7 @@
 # Erstellung des Inventory-Files im lokalen Ordner
     - name: "01 - Create inventory-file"
       template:
-        src: "configs/inventory.j2"
+        src: "../configs/inventory.j2"
         dest: "inventory"
 
 # Beginn zweites PLAY
