@@ -27,8 +27,8 @@ sps:
 # Dependencies CentOS8.3
 url_kernel_devel: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_devel}}"
 url_kernel_header: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_header}}"
-kernel_devel: "kernel-devel-4.18.0-240.el8.x86_64.rpm"
-kernel_header: "kernel-headers-4.18.0-240.el8.x86_64.rpm"
+kernel_devel: "kernel-devel-4.18.0-348.12.2.el8_5.x86_64"
+kernel_header: "kernel-headers-4.18.0-348.12.2.el8_5.x86_64"
 
 # Download-Files
 sps_install_filename: "Spectrum_Scale_Data_Access-{{sps_version}}-x86_64-Linux-install"
