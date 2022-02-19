@@ -1,0 +1,11 @@
+# Beginn erstes PLAY
+- name: "Configure local control-node"
+  hosts: 127.0.0.1
+  vars_files:
+    - "../vars/vars.yaml"
+  tasks:
+# Erstellung des Inventory-Files im lokalen Ordner
+    - name: "01 - Create inventory-file"
+      template:
+        src: "../configs/inventory.j2"
+        dest: "../inventory"

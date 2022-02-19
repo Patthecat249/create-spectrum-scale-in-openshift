@@ -1,15 +1,3 @@
-# Beginn erstes PLAY
-- name: "Configure local control-node"
-  hosts: 127.0.0.1
-  vars_files:
-    - "../vars/vars.yaml"
-  tasks:
-# Erstellung des Inventory-Files im lokalen Ordner
-    - name: "01 - Create inventory-file"
-      template:
-        src: "../configs/inventory.j2"
-        dest: "../inventory"
-
 # Beginn zweites PLAY
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Prepare Ansible-Control-Node and Spectrum-Scale-Nodes"
   hosts: spectrumscale
