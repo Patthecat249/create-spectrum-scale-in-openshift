@@ -1,15 +1,22 @@
+# Es können alle Variablen angepasst werden.
+
 # --- Spectrum-Node-Names
+## Die Namen müssen vom DNS aufgelöst werden können.
 node1: "scale1"
 node2: "scale2"
 node3: "scale3"
 domain: "home.local"
 
-# Spectrum-Scale-Version
+# Redhat Subscription Username + Password to enable RHEL for Updates and Package-Installation
+subscription_user: ""
+subscription_pass: ""
+
+# Spectrum-Scale - Version
 scale_version: "5.1.2-2"
 sps_version: "5.1.2.2"
 sps_filesystem_version: "5.1.2.2"
 
-# --- Spectrum-Scale detailed Hostname/IP-Configuration
+# Spectrum-Scale - Hostname/IP-Configuration
 sps:
   sps1:
     hostname: "{{node1}}"
@@ -23,12 +30,6 @@ sps:
     hostname: "{{node3}}"
     fqdn: "{{node3}}.{{domain}}"
     ip: "10.0.249.163"
-
-# Dependencies CentOS8.3
-url_kernel_devel: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_devel}}"
-url_kernel_header: "http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/{{kernel_header}}"
-kernel_devel: "kernel-devel-4.18.0-348.12.2.el8_5.x86_64"
-kernel_header: "kernel-headers-4.18.0-348.12.2.el8_5.x86_64"
 
 # Download-Files
 sps_install_filename: "Spectrum_Scale_Data_Access-{{sps_version}}-x86_64-Linux-install"

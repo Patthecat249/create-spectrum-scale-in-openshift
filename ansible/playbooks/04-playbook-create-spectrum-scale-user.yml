@@ -4,20 +4,24 @@
   vars_files:
     - "../vars/vars.yaml"
   tasks:
-    # Wait script einbauen
-    - name: "Wait until GUI is running (not thawing)"
-      shell: "systemctl status gpfsgui | grep running"
-      register: cmd_res
-      retries: 90
-      delay: 30
-      until: cmd_res.stdout_lines | list | count >= 1
+    # Stoppe und Starte die GPFSGUI erneut
+    - name: "Restarte die GPFSGUI"
+      raw: "systemctl stop gpfsgui && systemctl start gpfsgui"
 
+    # Warte bis die GUI komplett initialisiert ist
+    - name: "Wait until GUI return is equal 200"
+      shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w \"%{http_code}\" -o /dev/null"
+      register: cmd_res
+      retries: 60
+      delay: 10
+      until: cmd_res.stdout_lines == 200
+
+# Lege Benutzer in der Scale-GUI an
     - name: "Create User on GUI-Node"
       raw: "{{ item }}"
       with_items:
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_security_admin}} -p {{pass_security_admin}} -g SecurityAdmin"
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_csi_admin}} -p {{pass_csi_admin}} -g CsiAdmin"
-        # - "/usr/lpp/mmfs/gui/cli/mkusergrp {{grp_containeroperator}} --role {{role_containeroperator}}"
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_cnsa_storage_gui}} -p \'{{pass_cnsa_storage_gui}}\' -g ContainerOperator"
         - "/usr/lpp/mmfs/gui/cli/mkuser {{user_cnss}} -p \'{{pass_cnss}}\' -g ContainerOperator"
-      # when: "'{{ sps.sps3.fqdn }}' in inventory_hostname"
+      
