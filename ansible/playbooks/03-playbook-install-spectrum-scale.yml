@@ -222,6 +222,18 @@
     #   wait_for:
     #     timeout: 60
 
+# Debug Test
+    - name: "Wait until mmgetstate is active"
+      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      register: varmmgetstate
+      tags:
+        - testwaituntil1
+# Debug-Message
+    - name: "Debug-Message"
+      debug: msg="{{ varmmgetstate.stdout_lines }}"
+      tags:
+        - testwaituntil1
+
     - name: "Wait until mmgetstate is active"
       raw: "{{gpfs_binary_path}}mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate
@@ -231,16 +243,7 @@
       tags:
         - testwaituntil1
 
-    - name: "Wait until mmgetstate is active"
-      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
-      register: varmmgetstate
-      tags:
-        - testwaituntil1
-    # Debug-Message
-    - name: "Debug-Message"
-      debug: msg="{{ varmmgetstate.stdout_lines }}"
-      tags:
-        - testwaituntil1
+
 
 # Execute on only on one node Node
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure the Spectrum-Scale Filesystem"
