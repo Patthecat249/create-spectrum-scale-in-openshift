@@ -166,13 +166,23 @@
 
 # Starten der GUI
     - name: "21 - Start the GPFS-GUI on {{ sps.sps3.fqdn }}"
-      raw: "systemctl start gpfsgui"
+    - name: "Restarte die GPFSGUI"
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: gpfsgui
 
-# Wait 60 Seconds
-    - name: "Wait 60 Seconds...for starting up GUI"
-      wait_for:
-        timeout: 60
-
+# Warte bis die GUI komplett initialisiert ist
+    - name: "Wait until GPFSGUI-Return-Code = 200"
+      uri:
+        url: "https://{{ sps.sps3.fqdn }}"
+        follow_redirects: none
+        method: GET
+        validate_certs: "false"
+      register: _result
+      until: _result.status == 200
+      retries: 120 # 120 * 5 seconds = 10 Minutes 
+      delay: 5 # Every 5 seconds
 
 # Execute only on Spectrum-Scale-Node1
 #
@@ -187,14 +197,16 @@
 # Create the cluster
     - name: "24 - Create the Cluster with mmcrcluster"
       raw: "{{gpfs_binary_path}}mmcrcluster -N {{sps.sps1.fqdn}}:manager-quorum:{{sps.sps1.hostname}},{{sps.sps2.fqdn}}:manager:{{sps.sps2.hostname}},{{sps.sps3.fqdn}}:manager:{{sps.sps3.hostname}} -C {{sps_cluster_name}}"
-      # when: "'{{ sps.sps1.fqdn }}' in inventory_hostname"
+
 
 # Assign license to Nodes
     - name: "25 - Assign license with mmchlicense"
       raw: "{{gpfs_binary_path}}mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      # when: "'{{ sps.sps1.fqdn }}' in inventory_hostname"
 
 # Execute on all SpectrumScale-Nodes
+#
+# On ALL Nodes
+#
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Start Spectrum-Scale Filesystem"
   hosts: "spectrumscale"
   vars_files:
@@ -205,10 +217,20 @@
     - name: "26 - Start the GPFS-Cluster on all nodes with mmstartup"
       raw: "{{gpfs_binary_path}}mmstartup"
 
-# Wait 60 Seconds
-    - name: "Wait 60 Seconds...for starting up GPFS on all nodes"
-      wait_for:
-        timeout: 60
+# Wait 60 Seconds / Wait until mmgestate answers with "active"
+# mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active
+    # - name: "Wait 60 Seconds...for starting up GPFS on all nodes"
+    #   wait_for:
+    #     timeout: 60
+
+    - name: "Wait until mmgetstate is active"
+      raw: "mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      register: _result
+      until: _result.stdout == "active"
+      retries: 120 # 120 * 5 seconds = 10 Minutes 
+      delay: 5 # Every 5 seconds
+      tags:
+        - testwaituntil
 
 
 # Execute on only on one node Node
@@ -236,9 +258,22 @@
       raw: "{{gpfs_binary_path}}mmcrnsd -F {{dir_root}}StanzaFile"
 
 # Wait 30 Seconds
-    - name: "Wait a Minute...for becoming nsds ready on all nodes"
-      wait_for:
-        timeout: 60
+# Write a script to ask, when all nsds are mounted
+# mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep scale1.home.local
+    - name: "Wait until shared-disks are ready on all nodes"
+      raw: "mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep {{sps.sps1.fqdn}}"
+      register: shareddisk
+      until: shareddisk.stdout == "{{sps.sps1.fqdn}}"
+      retries: 120 # 120 * 5 seconds = 10 Minutes 
+      delay: 5 # Every 5 seconds
+      tags:
+        - testwaituntil
+
+
+    # - name: "Wait a Minute...for becoming nsds ready on all nodes"
+    #   wait_for:
+    #     timeout: 60
+
 
 # Create Filesystem
     - name: "29 - Create Filesystem for the Cluster with mmcrfs"
@@ -246,10 +281,21 @@
       tags:
         - createfs
 
+# Wait until filesystem is ready
+# mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep spsopenshift
+    - name: "Wait until filesystem is ready"
+      raw: "mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep {{sps_filesystem_fs1}}"
+      register: filesystem
+      until: filesystem.stdout == "{{sps_filesystem_fs1}}"
+      retries: 120 # 120 * 5 seconds = 10 Minutes 
+      delay: 5 # Every 5 seconds
+      tags:
+        - testwaituntil
+
 # Wait 10 Seconds
-    - name: "Wait 10 Seconds..."
-      wait_for:
-        timeout: 10
+    # - name: "Wait 10 Seconds..."
+    #   wait_for:
+    #     timeout: 10
 
 # Mount Filesystems
     - name: "30 - Mount Filesystems"
