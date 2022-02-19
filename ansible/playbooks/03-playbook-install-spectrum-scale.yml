@@ -223,7 +223,7 @@
     #     timeout: 60
 
     - name: "Wait until mmgetstate is active"
-      raw: "mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: _result
       until: _result.stdout == "active"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
@@ -232,7 +232,7 @@
         - testwaituntil1
 
     - name: "Wait until mmgetstate is active"
-      raw: "mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate
       tags:
         - testwaituntil
