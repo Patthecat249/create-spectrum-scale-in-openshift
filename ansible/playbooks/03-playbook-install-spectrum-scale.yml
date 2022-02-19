@@ -252,7 +252,7 @@
       register: varmmgetstate1
       # until: "varmmgetstate.stdout != 'active'"
       # until: "'active' in varmmgetstate1.stdout"
-      until: "varmmgetstate1.stdout | list | count >= 3"
+      until: "varmmgetstate1.stdout_lines | list | count >= 3"
       # until: (varmmgetstate.rc == 0) and (varmmgetstate.stdout != "")
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
