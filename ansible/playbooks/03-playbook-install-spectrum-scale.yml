@@ -238,8 +238,8 @@
       raw: "{{gpfs_binary_path}}mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate
       # until: varmmgetstate.stdout != "active"
-      until: varmmgetstate.stdout | list | count == 1
-      # until: (varmmgetstate.rc == 0) and (varmmgetstate.stdout != "")
+      # until: varmmgetstate.stdout | list | count == 1
+      until: (varmmgetstate.rc == 0) and (varmmgetstate.stdout != "")
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
