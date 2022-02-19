@@ -40,7 +40,7 @@ gpfs_binary_path: "/usr/lpp/mmfs/bin/"
 
 # Variables for Install GPFS-RPM-Packages
 gpfs_base: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.base-{{ scale_version }}.x86_64.rpm"
-gpfs_gskit: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.x86_64.rpm"
+gpfs_gskit: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gskit-8.0.55-19.1.x86_64.rpm"
 gpfs_license: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.license.da-{{ scale_version }}.x86_64.rpm"
 gpfs_java: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.java-{{ scale_version }}.x86_64.rpm"
 gpfs_gpl: "/usr/lpp/mmfs/{{sps_version}}/gpfs_rpms/gpfs.gpl-{{ scale_version }}.noarch.rpm"
