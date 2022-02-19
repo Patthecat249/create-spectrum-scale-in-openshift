@@ -200,7 +200,7 @@
 # ONLY on GUI-NODE
 #
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure Spectrum-Scale GUI-Node"
-  hosts: "{{ {{sps.sps3.fqdn}} }}"
+  hosts: "{{ sps.sps3.fqdn }}"
   vars_files:
     - "../vars/vars.yaml"
   gather_facts: false
