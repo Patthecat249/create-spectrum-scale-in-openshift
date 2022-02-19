@@ -223,24 +223,24 @@
     #     timeout: 60
 
     - name: "Wait until mmgetstate is active"
-      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      raw: "{{gpfs_binary_path}}mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: _result
       until: _result.stdout == "active"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
-        - testwaituntil1
+        - testwaituntil
 
-    - name: "Wait until mmgetstate is active"
-      raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
-      register: varmmgetstate
-      tags:
-        - testwaituntil
-    # Debug-Message
-    - name: "Debug-Message"
-      debug: msg="{{ varmmgetstate.stdout }}"
-      tags:
-        - testwaituntil
+    # - name: "Wait until mmgetstate is active"
+    #   raw: "/usr/lpp/mmfs/bin/mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+    #   register: varmmgetstate
+    #   tags:
+    #     - testwaituntil
+    # # Debug-Message
+    # - name: "Debug-Message"
+    #   debug: msg="{{ varmmgetstate.stdout }}"
+    #   tags:
+    #     - testwaituntil
 
 # Execute on only on one node Node
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure the Spectrum-Scale Filesystem"
@@ -270,7 +270,7 @@
 # Write a script to ask, when all nsds are mounted
 # mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep scale1.home.local
     - name: "Wait until shared-disks are ready on all nodes"
-      raw: "mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep {{sps.sps1.fqdn}}"
+      raw: "{{gpfs_binary_path}}mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep {{sps.sps1.fqdn}}"
       register: shareddisk
       until: shareddisk.stdout == "{{sps.sps1.fqdn}}"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
@@ -293,7 +293,7 @@
 # Wait until filesystem is ready
 # mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep spsopenshift
     - name: "Wait until filesystem is ready"
-      raw: "mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep {{sps_filesystem_fs1}}"
+      raw: "{{gpfs_binary_path}}mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep {{sps_filesystem_fs1}}"
       register: filesystem
       until: filesystem.stdout == "{{sps_filesystem_fs1}}"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
