@@ -304,7 +304,7 @@
     - name: "Wait until filesystem is ready"
       raw: "{{gpfs_binary_path}}mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep {{sps_filesystem_fs1}}"
       register: filesystem
-      until: "filesystem.stdout_lines >= 1"
+      until: "filesystem.stdout_lines | list | count >= 1"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
