@@ -10,7 +10,7 @@
 
     # Warte bis die GUI komplett initialisiert ist
     - name: "Wait until GUI return is equal 200"
-      shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w \"%{http_code}\" -o /dev/null"
+      shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w '%{http_code}' -o /dev/null"
       register: cmd_res
       retries: 60
       delay: 10
