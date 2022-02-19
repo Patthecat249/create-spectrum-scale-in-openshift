@@ -8,6 +8,19 @@
     - name: "Restarte die GPFSGUI"
       raw: "systemctl stop gpfsgui && systemctl start gpfsgui"
 
+    - name: "Test1"
+      shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w '%{http_code}' -o /dev/null"
+      register: cmd_res
+      tags:
+        - debug
+
+    # Debug-Message
+    - name: "Debug-Message"
+      debug: msg="{{ cmd_res.stdout_lines }}"
+      tags:
+        - debug
+
+
     # Warte bis die GUI komplett initialisiert ist
     - name: "Wait until GUI return is equal 200"
       shell: "curl -s -k https://{{ sps.sps3.fqdn }} -w '%{http_code}' -o /dev/null"
