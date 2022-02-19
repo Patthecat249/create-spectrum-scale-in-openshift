@@ -27,7 +27,9 @@
       register: cmd_res
       retries: 60
       delay: 10
-      until: cmd_res.stdout_lines == "200"
+      until: cmd_res.stdout == "200"
+      tags:
+        - test
 
 # Lege Benutzer in der Scale-GUI an
     - name: "Create User on GUI-Node"
