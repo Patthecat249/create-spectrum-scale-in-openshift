@@ -279,7 +279,7 @@
 # Write a script to ask, when all nsds are mounted
 # mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep scale1.home.local
     - name: "Wait until shared-disks are ready on all nodes"
-      raw: "{{gpfs_binary_path}}mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep {{sps.sps1.fqdn}}"
+      raw: "{{gpfs_binary_path}}mmlsnsd -Y | awk '{print $1}' | cut -d: -f10 | grep {{sps.sps1.fqdn}}"
       register: shareddisk
       until: "shareddisk.stdout_lines | list | count >= 3"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
