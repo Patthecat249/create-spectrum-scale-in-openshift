@@ -237,7 +237,8 @@
     - name: "Wait until mmgetstate is active (on {{inventory_hostname}})"
       raw: "{{gpfs_binary_path}}mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate
-      until: varmmgetstate.stdout != "active"
+      # until: varmmgetstate.stdout != "active"
+      until: varmmgetstate.rc == 0
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
