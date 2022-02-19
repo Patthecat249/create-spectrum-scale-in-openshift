@@ -20,7 +20,7 @@
     # Warte bis die GUI komplett initialisiert ist
     - name: "Wait until GPFSGUI-Return-Code = 200"
       uri:
-        url: "https://scale3"
+        url: "https://{{ sps.sps3.fqdn }}"
         follow_redirects: none
         method: GET
         validate_certs: "false"
