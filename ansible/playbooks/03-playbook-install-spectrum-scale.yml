@@ -216,7 +216,7 @@
         - rpms
 
 # Starten der GUI
-    - name: "21 - Start the GPFS-GUI on {{ {{sps.sps3.fqdn}} }}"
+    - name: "21 - Start the GPFS-GUI on {{ sps.sps3.fqdn }}"
       raw: "systemctl start gpfsgui"
 
 # Wait 60 Seconds
@@ -230,7 +230,7 @@
 # ONLY on NODE1
 #
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure Spectrum-Scale Filesystem"
-  hosts: "{{ {{sps.sps1.fqdn}} }}"
+  hosts: "{{ sps.sps1.fqdn }}"
   vars_files:
     - "../vars/vars.yaml"
   gather_facts: false
@@ -238,12 +238,12 @@
 # Create the cluster
     - name: "24 - Create the Cluster with mmcrcluster"
       raw: "{{gpfs_binary_path}}mmcrcluster -N {{sps.sps1.fqdn}}:manager-quorum:{{sps.sps1.hostname}},{{sps.sps2.fqdn}}:manager:{{sps.sps2.hostname}},{{sps.sps3.fqdn}}:manager:{{sps.sps3.hostname}} -C {{sps_cluster_name}}"
-      # when: "'{{ {{sps.sps1.fqdn}} }}' in inventory_hostname"
+      # when: "'{{ sps.sps1.fqdn }}' in inventory_hostname"
 
 # Assign license to Nodes
     - name: "25 - Assign license with mmchlicense"
       raw: "{{gpfs_binary_path}}mmchlicense server --accept -N {{sps.sps1.fqdn}},{{sps.sps2.fqdn}},{{sps.sps3.fqdn}}"
-      # when: "'{{ {{sps.sps1.fqdn}} }}' in inventory_hostname"
+      # when: "'{{ sps.sps1.fqdn }}' in inventory_hostname"
 
 # Execute on all SpectrumScale-Nodes
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Start Spectrum-Scale Filesystem"
@@ -264,7 +264,7 @@
 
 # Execute on only on one node Node
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure the Spectrum-Scale Filesystem"
-  hosts: "{{ {{sps.sps1.fqdn}} }}"
+  hosts: "{{ sps.sps1.fqdn }}"
   vars_files:
     - "../vars/vars.yaml"
   gather_facts: false
@@ -325,7 +325,7 @@
 
 # Execute on only on one node Node
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure GUI"
-  hosts: "{{ {{sps.sps3.fqdn}} }}"
+  hosts: "{{ sps.sps3.fqdn }}"
   vars_files:
     - "../vars/vars.yaml"
   gather_facts: false
