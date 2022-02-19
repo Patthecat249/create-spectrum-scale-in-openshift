@@ -235,29 +235,26 @@
     #   wait_for:
     #     timeout: 60
 
-# Debug Test
-    - name: "Debug - Wait until mmgetstate is active (on {{inventory_hostname}})"
-      raw: "/usr/lpp/mmfs/bin/mmgetstate -a -Y | awk '{print $1}' | cut -d: -f9 | grep active"
-      register: varmmgetstate
-      tags:
-        - testwaituntil1
-# Debug-Message
-    - name: "Debug-Message"
-      debug: msg="{{ varmmgetstate.stdout_lines }}"
-      tags:
-        - testwaituntil1
+# # Debug Test
+#     - name: "Debug - Wait until mmgetstate is active (on {{inventory_hostname}})"
+#       raw: "/usr/lpp/mmfs/bin/mmgetstate -a -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+#       register: varmmgetstate
+#       tags:
+#         - testwaituntil1
+# # Debug-Message
+#     - name: "Debug-Message"
+#       debug: msg="{{ varmmgetstate.stdout_lines }}"
+#       tags:
+#         - testwaituntil1
 
     - name: "Wait until mmgetstate is active (on {{inventory_hostname}})"
       raw: "{{gpfs_binary_path}}mmgetstate -a -Y | awk '{print $1}' | cut -d: -f9 | grep active"
       register: varmmgetstate1
-      # until: "varmmgetstate.stdout != 'active'"
-      # until: "'active' in varmmgetstate1.stdout"
       until: "varmmgetstate1.stdout_lines | list | count >= 3"
-      # until: (varmmgetstate.rc == 0) and (varmmgetstate.stdout != "")
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
-        - testwaituntil1
+        - testwaituntil
 
 
 
@@ -284,7 +281,7 @@
     - name: "Wait until shared-disks are ready on all nodes"
       raw: "{{gpfs_binary_path}}mmlsnsd -d nsdshared01 -Y | awk '{print $1}' | cut -d: -f10 | grep {{sps.sps1.fqdn}}"
       register: shareddisk
-      until: shareddisk.stdout == "{{sps.sps1.fqdn}}"
+      until: "shareddisk.stdout_lines | list | count >= 3"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
@@ -307,7 +304,7 @@
     - name: "Wait until filesystem is ready"
       raw: "{{gpfs_binary_path}}mmlsfs spsopenshift -T -Y | awk '{print $1}' | cut -d: -f7 | grep {{sps_filesystem_fs1}}"
       register: filesystem
-      until: filesystem.stdout == "{{sps_filesystem_fs1}}"
+      until: "filesystem.stdout_lines >= 1"
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
