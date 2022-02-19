@@ -229,8 +229,18 @@
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
-        - testwaituntil
+        - testwaituntil1
 
+    - name: "Wait until mmgetstate is active"
+      raw: "mmgetstate -L -Y | awk '{print $1}' | cut -d: -f9 | grep active"
+      register: varmmgetstate
+      tags:
+        - testwaituntil
+    # Debug-Message
+    - name: "Debug-Message"
+      debug: msg="{{ varmmgetstate.stdout }}"
+      tags:
+        - testwaituntil
 
 # Execute on only on one node Node
 - name: "{{ lookup('pipe','date \"+%Y-%m-%d %H-%M-%S\"') }} | Playbook Configure the Spectrum-Scale Filesystem"
