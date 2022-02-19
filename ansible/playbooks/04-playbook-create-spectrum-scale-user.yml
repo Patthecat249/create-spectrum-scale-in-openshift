@@ -35,13 +35,14 @@
         url: "https://scale3"
         follow_redirects: none
         method: GET
+        validate_certs: "false"
       register: _result
       until: _result.status == 200
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
       tags:
         - test
-        
+
 # Lege Benutzer in der Scale-GUI an
     - name: "Create User on GUI-Node"
       raw: "{{ item }}"
