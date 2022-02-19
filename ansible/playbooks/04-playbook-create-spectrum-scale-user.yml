@@ -29,6 +29,18 @@
       retries: 120 # 120 * 5 seconds = 10 Minutes 
       delay: 5 # Every 5 seconds
 
+# Prüfe, ob Benutzer in der GUI existieren
+# /usr/lpp/mmfs/gui/cli/lsuser -Y | awk '{print $1}' | cut -d: -f7 | grep patrick
+    # - name: "Check, if User exists on GUI-Node"
+    #   raw: "{{ item }}"
+    #   with_items:
+    #     - "/usr/lpp/mmfs/gui/cli/lsuser -Y | awk '{print $1}' | cut -d: -f7 | grep {{user_security_admin}}"
+    #     - "/usr/lpp/mmfs/gui/cli/lsuser -Y | awk '{print $1}' | cut -d: -f7 | grep {{user_csi_admin}}"
+    #     - "/usr/lpp/mmfs/gui/cli/lsuser -Y | awk '{print $1}' | cut -d: -f7 | grep {{user_cnsa_storage_gui}}"
+    #     - "/usr/lpp/mmfs/gui/cli/lsuser -Y | awk '{print $1}' | cut -d: -f7 | grep {{user_cnss}}"
+    #   tags:
+    #     - checkusers
+
 
 # Lege Benutzer in der Scale-GUI an
     - name: "Create User on GUI-Node"
