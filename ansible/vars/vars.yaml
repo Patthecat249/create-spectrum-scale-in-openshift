@@ -109,6 +109,7 @@ sps_filesystem_fs1: "spsopenshift"
 # Working-Directories
 dir_spectrumscalenodes: "/opt/sva/terraform/spectrumscale-nodes/"
 dir_root: "/opt/sva/spectrumscale/"
+dir_cnsa: "/opt/sva/spectrumscale/"
 
 # SSH-Settings
 private_root_key: "/root/.ssh/id_rsa"
